@@ -3,9 +3,9 @@ package edu.br.ufpe.cin.sword.cm.strategies;
 import java.util.Optional;
 import java.util.Set;
 
-public interface CopyStrategy<T, S> {
-	Optional<Set<T>> copy(Set<T> clause);
+public interface CopyStrategy<Literal, CopyState, ConnState> {
+	Optional<Set<Literal>> copy(Set<Literal> clause, ConnectionStrategy<Literal, ConnState> connStrategy);
 	void clear();
-	S getState();
-	void setState(S state);
+	CopyState getState();
+	void setState(CopyState state);
 }
