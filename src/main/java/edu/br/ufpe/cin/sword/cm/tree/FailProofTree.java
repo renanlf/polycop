@@ -7,5 +7,10 @@ public class FailProofTree<Literal> extends ProofTree<Literal> {
 	public FailProofTree(Set<Literal> clause, Set<Literal> path) {
 		super(clause, path);
 	}
-    
+
+	@Override
+	public String toString() {
+		return "fail()";
+	}
+
 }

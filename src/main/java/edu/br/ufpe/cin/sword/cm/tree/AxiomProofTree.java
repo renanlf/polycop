@@ -8,5 +8,10 @@ public class AxiomProofTree<Literal> extends ProofTree<Literal> {
 	public AxiomProofTree(Set<Literal> path) {
 		super(Collections.emptySet(), path);
 	}
-    
+
+	@Override
+	public String toString() {
+		return "ax()";
+	}
+
 }
