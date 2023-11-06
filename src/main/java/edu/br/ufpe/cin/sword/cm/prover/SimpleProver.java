@@ -15,12 +15,12 @@ import edu.br.ufpe.cin.sword.cm.tree.ProofTreeFactory;
 public class SimpleProver<Literal, ConnectionState, CopyState> {
 
 	private final ConnectionStrategy<Literal, ConnectionState> connStrategy;
-	private final CopyStrategy<Literal, CopyState, ConnectionState> copyStrategy;
-	private final LiteralHelperStrategy<Literal, ConnectionState> litHelperStrategy;
+	private final CopyStrategy<Literal, CopyState> copyStrategy;
+	private final LiteralHelperStrategy<Literal> litHelperStrategy;
 	private final ProofTreeFactory<Literal> proofFactory;
 
-	public SimpleProver(LiteralHelperStrategy<Literal, ConnectionState> litHelperStrategy,
-			ConnectionStrategy<Literal, ConnectionState> connStrategy, CopyStrategy<Literal, CopyState, ConnectionState> copyStrategy) {
+	public SimpleProver(LiteralHelperStrategy<Literal> litHelperStrategy,
+			ConnectionStrategy<Literal, ConnectionState> connStrategy, CopyStrategy<Literal, CopyState> copyStrategy) {
 		super();
 		this.connStrategy = connStrategy;
 		this.copyStrategy = copyStrategy;
