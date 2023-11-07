@@ -51,6 +51,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 	}
 
 	private ProofTree<Literal> proveClause(Set<Literal> clause, Set<Set<Literal>> matrix, Set<Literal> path) {
+		System.out.println(clause);
 		if (clause.isEmpty())
 			return proofFactory.ax(path);
 
@@ -58,7 +59,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 		Literal literal = clause.stream().findAny().get();
 
 		ConnectionState connState = connStrategy.getState();
-		for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, path, connStrategy)) {
+		for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, path)) {
 			if (!connStrategy.connect(literal, negLiteral))
 				continue;
 
@@ -77,7 +78,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 			Optional<Set<Literal>> copyClause = copyStrategy.copy(matrixClause, connStrategy);
 
 			if (copyClause.isPresent()) {
-				for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, copyClause.get(), connStrategy)) {
+				for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, copyClause.get())) {
 					connStrategy.connect(literal, negLiteral);
 					ProofTree<Literal> subProofLeft = proveClause(minus(copyClause.get(), negLiteral), matrix,
 							add(path, literal));
