@@ -1,6 +1,6 @@
 package edu.br.ufpe.cin.sword.cm.alchb.model;
 
-public class ALCHbConceptLiteral {
+public class ALCHbConceptLiteral implements ALCHbLiteral{
 	
 	private final String name;
 	private final ALCHbTerm term;
