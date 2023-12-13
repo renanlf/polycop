@@ -12,15 +12,16 @@ import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.ProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.ProofTreeFactory;
 
-public class SimpleProver<Literal, ConnectionState, CopyState> {
+public class SimpleProver<Literal, Term, ConnectionState, CopyState> {
 
-	private final ConnectionStrategy<Literal, ConnectionState> connStrategy;
-	private final CopyStrategy<Literal, CopyState> copyStrategy;
+	private final ConnectionStrategy<Literal, Term, ConnectionState> connStrategy;
+	private final CopyStrategy<Literal, Term, CopyState> copyStrategy;
 	private final LiteralHelperStrategy<Literal> litHelperStrategy;
 	private final ProofTreeFactory<Literal> proofFactory;
 
 	public SimpleProver(LiteralHelperStrategy<Literal> litHelperStrategy,
-			ConnectionStrategy<Literal, ConnectionState> connStrategy, CopyStrategy<Literal, CopyState> copyStrategy) {
+			ConnectionStrategy<Literal, Term, ConnectionState> connStrategy, 
+			CopyStrategy<Literal, Term, CopyState> copyStrategy) {
 		super();
 		this.connStrategy = connStrategy;
 		this.copyStrategy = copyStrategy;
@@ -34,7 +35,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 
 		CopyState copyState = copyStrategy.getState();
 		for (Set<Literal> clause : matrix) {
-			Optional<Set<Literal>> copyClause = copyStrategy.copy(clause, connStrategy);
+			Optional<Set<Literal>> copyClause = copyStrategy.copy(clause, connStrategy, Collections.emptySet());
 
 			if (copyClause.isPresent()) {
 
@@ -75,7 +76,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 		CopyState copyState = copyStrategy.getState();
 
 		for (Set<Literal> matrixClause : matrix) {
-			Optional<Set<Literal>> copyClause = copyStrategy.copy(matrixClause, connStrategy);
+			Optional<Set<Literal>> copyClause = copyStrategy.copy(matrixClause, connStrategy, path);
 
 			if (copyClause.isPresent()) {
 				for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, copyClause.get())) {

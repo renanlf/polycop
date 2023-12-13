@@ -21,7 +21,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, ALCHbTerm, 
 
 	@Override
 	public Optional<Set<ALCHbLiteral>> copy(Set<ALCHbLiteral> clause,
-			ConnectionStrategy<ALCHbLiteral, ALCHbTerm, ?> connStrategy, List<ALCHbLiteral> path) {
+			ConnectionStrategy<ALCHbLiteral, ALCHbTerm, ?> connStrategy, Set<ALCHbLiteral> path) {
 		
 		if(clause.stream()
 				.filter(l -> l instanceof ALCHbConceptLiteral)
@@ -32,7 +32,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, ALCHbTerm, 
 		throw new IllegalArgumentException("Not implemented yet!");
 	}
 
-	private boolean isBlocked(ALCHbConceptLiteral literal, List<ALCHbLiteral> path,
+	private boolean isBlocked(ALCHbConceptLiteral literal, Set<ALCHbLiteral> path,
 			ConnectionStrategy<ALCHbLiteral, ALCHbTerm, ?> connStrategy) {
 		ALCHbTerm term = connStrategy.getSubstitution(literal.getTerm());
 
@@ -60,7 +60,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, ALCHbTerm, 
 		return false;
 	}
 
-	private Set<String> conceptsSet(ALCHbTerm term, List<ALCHbLiteral> path,
+	private Set<String> conceptsSet(ALCHbTerm term, Set<ALCHbLiteral> path,
 			ConnectionStrategy<ALCHbLiteral, ALCHbTerm, ?> connStrategy) {
 		return path.stream().filter(l -> l instanceof ALCHbConceptLiteral).map(l -> (ALCHbConceptLiteral) l)
 				.filter(l -> connStrategy.getSubstitution(l.getTerm()) == term).map(l -> l.getName())
