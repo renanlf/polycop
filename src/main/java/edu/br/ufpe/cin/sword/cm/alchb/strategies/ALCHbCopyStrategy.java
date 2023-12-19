@@ -1,6 +1,7 @@
 package edu.br.ufpe.cin.sword.cm.alchb.strategies;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -9,84 +10,160 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.br.ufpe.cin.sword.cm.alchb.factories.ALCHbFactory;
+import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbBiOrderedLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbConceptLiteral;
+import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbIndividual;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbLiteral;
+import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbOrderedLiteral;
+import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbRoleLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbTerm;
-import edu.br.ufpe.cin.sword.cm.strategies.ConnectionStrategy;
+import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbUnaryIndividual;
+import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbVariable;
 import edu.br.ufpe.cin.sword.cm.strategies.CopyStrategy;
 
-public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, ALCHbTerm, Map<ALCHbLiteral, List<ALCHbLiteral>>> {
+public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, ALCHbTerm, Map<ALCHbTerm, List<ALCHbTerm>>> {
 
-	private Map<ALCHbLiteral, List<ALCHbLiteral>> copies;
+	private static final String COPY_SYMBOL = "'";
+	
+	private Map<ALCHbTerm, List<ALCHbTerm>> copies;
+	private final ALCHbFactory factory;
+	
+	public ALCHbCopyStrategy(ALCHbFactory factory) {
+		this.copies = new HashMap<>();
+		this.factory = factory;
+	}
 
 	@Override
-	public Optional<Set<ALCHbLiteral>> copy(Set<ALCHbLiteral> clause,
-			ConnectionStrategy<ALCHbLiteral, ALCHbTerm, ?> connStrategy, Set<ALCHbLiteral> path) {
+	public Optional<Collection<ALCHbLiteral>> copy(Collection<ALCHbLiteral> clause) {
+
+		// "open" map to add new copies
+		copies = new HashMap<>(copies);
 		
-		if(clause.stream()
-				.filter(l -> l instanceof ALCHbConceptLiteral)
-				.anyMatch(l -> isBlocked((ALCHbConceptLiteral) l, path, connStrategy)))
-			return Optional.empty();
-		
-		// TODO: copy
-		throw new IllegalArgumentException("Not implemented yet!");
-	}
-
-	private boolean isBlocked(ALCHbConceptLiteral literal, Set<ALCHbLiteral> path,
-			ConnectionStrategy<ALCHbLiteral, ALCHbTerm, ?> connStrategy) {
-		ALCHbTerm term = connStrategy.getSubstitution(literal.getTerm());
-
-		Set<String> termConceptSet = conceptsSet(term, path, connStrategy);
-
-		if (termConceptSet.contains(literal.getName()))
-			return true;
-
-		// if literal is not a key then it must be in some list
-		if (!copies.containsKey(literal)) {
-			Optional<Map.Entry<ALCHbLiteral, List<ALCHbLiteral>>> optEntry = copies.entrySet().stream()
-					.filter(e -> e.getValue().contains(literal)).findFirst();
-
-			if (optEntry.isEmpty())
-				throw new IllegalArgumentException("Should exists in a copy list");
-
-			int indexOfLiteral = optEntry.get().getValue().indexOf(literal);
-			ALCHbTerm previousTerm = (indexOfLiteral == 0 ? (ALCHbConceptLiteral) optEntry.get().getKey()
-					: (ALCHbConceptLiteral) optEntry.get().getValue().get(indexOfLiteral - 1)).getTerm();
-
-			if (conceptsSet(previousTerm, path, connStrategy).containsAll(termConceptSet))
-				return true;
-		}
-
-		return false;
-	}
-
-	private Set<String> conceptsSet(ALCHbTerm term, Set<ALCHbLiteral> path,
-			ConnectionStrategy<ALCHbLiteral, ALCHbTerm, ?> connStrategy) {
-		return path.stream().filter(l -> l instanceof ALCHbConceptLiteral).map(l -> (ALCHbConceptLiteral) l)
-				.filter(l -> connStrategy.getSubstitution(l.getTerm()) == term).map(l -> l.getName())
+		// get terms and their copies
+		Set<ALCHbTerm> terms = clause.stream()
+				.flatMap(ALCHbLiteral::fullTerms)
 				.collect(Collectors.toSet());
+		
+		Set<ALCHbIndividual> inds = terms.stream()
+				.filter(t -> t instanceof ALCHbIndividual)
+				.map(t -> (ALCHbIndividual) t)
+				.collect(Collectors.toSet());
+		
+		Map<ALCHbTerm, ALCHbTerm> termsMap = new HashMap<>();
+		inds.forEach(ind -> termsMap.put(ind, ind));
+		
+		Map<ALCHbVariable, ALCHbVariable> varsMap = terms.stream()
+				.filter(t -> t instanceof ALCHbVariable)
+				.collect(Collectors.toMap(t -> (ALCHbVariable) t, t -> copyVariable((ALCHbVariable) t)));
+		
+		termsMap.putAll(varsMap);
+		
+		Map<ALCHbUnaryIndividual, ALCHbUnaryIndividual> unIndMap = terms.stream()
+				.filter(t -> t instanceof ALCHbUnaryIndividual)
+				.collect(Collectors.toMap(t -> (ALCHbUnaryIndividual) t, t -> copyUnaryInd((ALCHbUnaryIndividual) t, termsMap)));
+		
+		termsMap.putAll(unIndMap);
+		
+		// get the new clause
+		Set<ALCHbLiteral> copiedClause = clause.stream()
+				.map(l -> copyLiteral(l, termsMap))
+				.collect(Collectors.toSet());
+		
+		// "closes" the map after adding copies
+		copies = Collections.unmodifiableMap(copies);
+		
+		return Optional.of(copiedClause);
+		
+	}
+	
+	private ALCHbVariable copyVariable(ALCHbVariable var) {
+		var = var.getCopyOf() == null ? var : (ALCHbVariable) var.getCopyOf();
+				
+		if (!copies.containsKey(var))
+			copies.put(var, Collections.emptyList());
+
+		// "opens" the list to add new copies
+		List<ALCHbTerm> copiesList = new ArrayList<>(copies.get(var));
+		
+		int numberOfCopies = copiesList.size();
+		String newTermName = var.getName() + COPY_SYMBOL.repeat(numberOfCopies + 1);
+		
+		ALCHbVariable newVar = factory.var(newTermName, var);
+		copiesList.add(newVar);
+		
+		// "closes" the list and adds it to the map
+		copies.put(var, Collections.unmodifiableList(copiesList));
+		
+		return newVar;
+	}
+	
+	private ALCHbUnaryIndividual copyUnaryInd(ALCHbUnaryIndividual term, Map<ALCHbTerm, ALCHbTerm> termsMap) {
+		term = term.getCopyOf() == null ? term : (ALCHbUnaryIndividual) term.getCopyOf();
+		
+		if (!copies.containsKey(term))
+			copies.put(term, Collections.emptyList());
+
+		// "opens" the list to add new copies
+		List<ALCHbTerm> copiesList = new ArrayList<>(copies.get(term));
+		
+		int numberOfCopies = copiesList.size();
+		String newTermName = term.getName() + COPY_SYMBOL.repeat(numberOfCopies + 1);
+		
+		ALCHbUnaryIndividual newUnaryInd = factory.unaryInd(newTermName, termsMap.get(term.getFillerTerm()), term);
+		copiesList.add(newUnaryInd);
+
+		// "closes" the list and adds it to the map
+		copies.put(term, Collections.unmodifiableList(copiesList));
+		
+		return newUnaryInd;
+	}
+
+	private ALCHbLiteral copyLiteral(ALCHbLiteral literal, Map<ALCHbTerm, ALCHbTerm> termsMap) {
+		if(literal instanceof ALCHbConceptLiteral) {
+			ALCHbConceptLiteral conLit = (ALCHbConceptLiteral) literal;
+			return factory.conLiteral(conLit.getName(), conLit.isPositive(), termsMap.get(conLit.getTerm()));
+		}
+		
+		if(literal instanceof ALCHbRoleLiteral) {
+			ALCHbRoleLiteral roleLit = (ALCHbRoleLiteral) literal;
+			return factory.roleLiteral(roleLit.getName(), roleLit.isPositive(), 
+					termsMap.get(roleLit.getFirst()),
+					termsMap.get(roleLit.getSecond()));
+		}
+		
+		if(literal instanceof ALCHbOrderedLiteral) {
+			ALCHbOrderedLiteral ordLit = (ALCHbOrderedLiteral) literal;
+			return factory.ordLiteral(ordLit.isPositive(), 
+					termsMap.get(ordLit.getFirst()),
+					termsMap.get(ordLit.getSecond()));
+		}
+		
+		if(literal instanceof ALCHbBiOrderedLiteral) {
+			ALCHbBiOrderedLiteral biOrdLit = (ALCHbBiOrderedLiteral) literal;
+			return factory.biOrdLiteral(biOrdLit.isPositive(), 
+					termsMap.get(biOrdLit.getFirst()),
+					termsMap.get(biOrdLit.getSecond()), 
+					termsMap.get(biOrdLit.getThird()),
+					termsMap.get(biOrdLit.getFourth()));
+		}
+		
+		throw new ClassCastException("Literal invalid for " + literal.getClass());		
 	}
 
 	@Override
 	public void clear() {
-		copies.clear();
+		copies = Collections.emptyMap();
 	}
 
 	@Override
-	public Map<ALCHbLiteral, List<ALCHbLiteral>> getState() {
-		Map<ALCHbLiteral, List<ALCHbLiteral>> newMap = new HashMap<>();
-
-		for (Map.Entry<ALCHbLiteral, List<ALCHbLiteral>> entry : copies.entrySet()) {
-			newMap.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-		}
-
-		return Collections.unmodifiableMap(new HashMap<>(copies));
+	public Map<ALCHbTerm, List<ALCHbTerm>> getState() {
+		return copies;
 	}
 
 	@Override
-	public void setState(Map<ALCHbLiteral, List<ALCHbLiteral>> state) {
-		copies.clear();
-		copies.putAll(state);
+	public void setState(Map<ALCHbTerm, List<ALCHbTerm>> state) {
+		copies = Collections.unmodifiableMap(new HashMap<>(state));
 	}
 
 }

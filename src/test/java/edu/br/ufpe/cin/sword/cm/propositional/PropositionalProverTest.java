@@ -6,9 +6,6 @@ import org.junit.Test;
 
 import edu.br.ufpe.cin.sword.cm.propositonal.PropositionalMatrixBuilder;
 import edu.br.ufpe.cin.sword.cm.propositonal.PropositionalProver;
-import edu.br.ufpe.cin.sword.cm.propositonal.strategies.PropositionalConnectionStrategy;
-import edu.br.ufpe.cin.sword.cm.propositonal.strategies.PropositionalCopyStrategy;
-import edu.br.ufpe.cin.sword.cm.propositonal.strategies.PropositionalHelperStrategy;
 import edu.br.ufpe.cin.sword.cm.tree.ExtensionProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.ProofTree;
@@ -21,8 +18,7 @@ public class PropositionalProverTest {
 		
 		PropositionalMatrixBuilder builder = new PropositionalMatrixBuilder();
 		
-		PropositionalProver prover = new PropositionalProver(new PropositionalHelperStrategy(),
-				new PropositionalConnectionStrategy(), new PropositionalCopyStrategy());
+		PropositionalProver prover = new PropositionalProver();
 		
 		ProofTree<String> proof;
 		

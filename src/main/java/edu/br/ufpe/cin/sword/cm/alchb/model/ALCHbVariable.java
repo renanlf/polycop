@@ -6,4 +6,8 @@ public class ALCHbVariable extends ALCHbTerm {
 		super(name);
 	}
 	
+	public ALCHbVariable(String name, ALCHbVariable copyOf) {
+		super(name, copyOf);
+	}
+	
 }

@@ -1,22 +1,22 @@
 package edu.br.ufpe.cin.sword.cm.propositonal.strategies;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import edu.br.ufpe.cin.sword.cm.strategies.ConnectionStrategy;
 import edu.br.ufpe.cin.sword.cm.strategies.CopyStrategy;
 
-public class PropositionalCopyStrategy implements CopyStrategy<String, Void, Set<Set<String>>> {
+public class PropositionalCopyStrategy implements CopyStrategy<String, Void, Set<Collection<String>>> {
 	
-	private Set<Set<String>> usedClauses;
+	private Set<Collection<String>> usedClauses;
 	
 	public PropositionalCopyStrategy() {
 		this.usedClauses = new HashSet<>();
 	}
 
 	@Override
-	public Optional<Set<String>> copy(Set<String> clause, ConnectionStrategy<String, Void, ?> connStrategy, Set<String> path) {
+	public Optional<Collection<String>> copy(Collection<String> clause) {
 		if(usedClauses.contains(clause)) {
 			return Optional.empty();
 		}
@@ -31,12 +31,12 @@ public class PropositionalCopyStrategy implements CopyStrategy<String, Void, Set
 	}
 
 	@Override
-	public Set<Set<String>> getState() {
+	public Set<Collection<String>> getState() {
 		return new HashSet<>(usedClauses);
 	}
 
 	@Override
-	public void setState(Set<Set<String>> state) {
+	public void setState(Set<Collection<String>> state) {
 		usedClauses.clear();
 		usedClauses.addAll(state);
 	}
