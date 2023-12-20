@@ -42,7 +42,7 @@ public class ALCHbUnaryIndividual extends ALCHbTerm {
 	
 	@Override
 	public String toString() {
-		return String.format("%s_%s", getName(), fillerTerm.toString());
+		return String.format("%s_{%s}", getName(), fillerTerm.toString());
 	}
 	
 }

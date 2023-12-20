@@ -262,7 +262,9 @@ public class ALCHbProverTest {
 			factory.var("x_{17}"),
 			factory.var("x_{18}"),
 			factory.var("x_{19}"),
-			factory.var("x_{20}")
+			factory.var("x_{20}"),
+			factory.var("x_{21}"),
+			factory.var("x_{22}")
 		};
 		
 		ALCHbIndividual a = factory.ind("a");
@@ -275,9 +277,9 @@ public class ALCHbProverTest {
 		ALCHbUnaryIndividual g_x_11 = factory.unaryInd("g", x[11]);
 		ALCHbUnaryIndividual g_x_13 = factory.unaryInd("g", x[13]);
 		
-		ALCHbUnaryIndividual h_x_10 = factory.unaryInd("g", x[10]);
-		ALCHbUnaryIndividual h_x_12 = factory.unaryInd("g", x[12]);
-		ALCHbUnaryIndividual h_x_14 = factory.unaryInd("g", x[14]);
+		ALCHbUnaryIndividual h_x_10 = factory.unaryInd("h", x[10]);
+		ALCHbUnaryIndividual h_x_12 = factory.unaryInd("h", x[12]);
+		ALCHbUnaryIndividual h_x_14 = factory.unaryInd("h", x[14]);
 		
 		Collection<Collection<ALCHbLiteral>> matrix = factory.matrixOf(
 			// \exists s . B \sub N
@@ -335,9 +337,9 @@ public class ALCHbProverTest {
 					factory.roleLiteral("r", false, x[17], x[18])
 			),			
 			factory.clauseOf(
-					factory.roleLiteral("N_r", true, x[17], x[18]),
-					factory.roleLiteral("r", true, x[19], x[20]),
-					factory.biOrdLiteral(true, x[19], x[20], x[17], x[18])
+					factory.roleLiteral("N_r", true, x[19], x[20]),
+					factory.roleLiteral("r", true, x[21], x[22]),
+					factory.biOrdLiteral(true, x[21], x[22], x[19], x[20])
 			),
 			// N_r (a, b)
 			factory.clauseOf(
