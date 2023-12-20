@@ -1,13 +1,16 @@
 package edu.br.ufpe.cin.sword.cm.alchb.strategies;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbBiOrderedLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbConceptLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbLiteral;
+import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbOrderedLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbRoleLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbTerm;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbVariable;
@@ -30,6 +33,12 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		
 		if(literal instanceof ALCHbRoleLiteral) 
 			return isBlocked((ALCHbRoleLiteral) literal, path, subs, copies);
+		
+		if(literal instanceof ALCHbOrderedLiteral) 
+			return isBlocked((ALCHbOrderedLiteral) literal, path, subs);
+		
+		if(literal instanceof ALCHbBiOrderedLiteral) 
+			return isBlocked((ALCHbBiOrderedLiteral) literal, path, subs);
 		
 		return false;
 		
@@ -110,7 +119,76 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		
 		return false;
 	}
-
+	
+	private boolean isBlocked(ALCHbOrderedLiteral literal, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
+		Set<Map.Entry<ALCHbTerm, ALCHbTerm>> edges = path.stream()
+				.filter(l -> l instanceof ALCHbOrderedLiteral)
+				.map(l -> Map.entry(((ALCHbOrderedLiteral) l).getFirst(), 
+						((ALCHbOrderedLiteral) l).getSecond()))
+				.collect(Collectors.toSet());
+		
+		ALCHbTerm term = getSubstitution(literal.getFirst(), subs);
+		
+		List<ALCHbTerm> cursors = new ArrayList<>();
+		cursors.add(term);
+		
+		do {
+			ALCHbTerm cursor = cursors.get(0);
+			
+			Set<ALCHbTerm> moreTypicalTerms = edges.stream()
+					.filter(e -> getSubstitution(e.getKey(), subs) == cursor)
+					.map(e -> getSubstitution(e.getValue(), subs))
+					.collect(Collectors.toSet());
+			
+			if(moreTypicalTerms.contains(term)) {
+				return true;
+			}
+			
+			cursors.remove(cursor);
+			cursors.addAll(moreTypicalTerms);			
+			
+		} while (!cursors.isEmpty());
+		
+		return false;
+		
+	}
+	
+	private boolean isBlocked(ALCHbBiOrderedLiteral literal, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
+		Set<Map.Entry<Map.Entry<ALCHbTerm, ALCHbTerm>, Map.Entry<ALCHbTerm, ALCHbTerm>>> edges = path.stream()
+				.filter(l -> l instanceof ALCHbBiOrderedLiteral)
+				.map(l -> Map.entry(
+						Map.entry(((ALCHbBiOrderedLiteral) l).getFirst(), ((ALCHbBiOrderedLiteral) l).getSecond()),
+						Map.entry(((ALCHbBiOrderedLiteral) l).getThird(), ((ALCHbBiOrderedLiteral) l).getFourth()))
+				)
+				.collect(Collectors.toSet());
+		
+		Map.Entry<ALCHbTerm, ALCHbTerm> pair = Map.entry(getSubstitution(literal.getFirst(), subs), getSubstitution(literal.getSecond(), subs));
+		
+		List<Map.Entry<ALCHbTerm, ALCHbTerm>> cursors = new ArrayList<>();
+		cursors.add(pair);
+		
+		do {
+			Map.Entry<ALCHbTerm, ALCHbTerm> cursor = cursors.get(0);
+			
+			Set<Map.Entry<ALCHbTerm, ALCHbTerm>> moreTypicalPairs = edges.stream()
+					.filter(e -> getSubstitution(e.getKey().getKey(), subs) == cursor.getKey()
+							&& getSubstitution(e.getKey().getValue(), subs) == cursor.getValue())
+					.map(e -> Map.entry(getSubstitution(e.getValue().getKey(), subs), 
+							getSubstitution(e.getValue().getValue(), subs)))
+					.collect(Collectors.toSet());
+			
+			if(moreTypicalPairs.contains(pair)) {
+				return true;
+			}
+			
+			cursors.remove(cursor);
+			cursors.addAll(moreTypicalPairs);			
+			
+		} while (!cursors.isEmpty());
+		
+		return false;
+		
+	}
 
 	private Set<String> conceptsSet(ALCHbTerm term, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
 		final ALCHbTerm subsTerm = getSubstitution(term, subs);
