@@ -3,6 +3,8 @@ package edu.br.ufpe.cin.sword.cm.alchb;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,6 +14,7 @@ import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbIndividual;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbUnaryIndividual;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbVariable;
+import edu.br.ufpe.cin.sword.cm.alchb.visitor.LaTeXMatrixVisitor;
 import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.ProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.StartProofTree;
@@ -269,17 +272,17 @@ public class ALCHbProverTest {
 		
 		ALCHbIndividual a = factory.ind("a");
 		ALCHbIndividual b = factory.ind("b");
-		ALCHbUnaryIndividual f_x_5 = factory.unaryInd("f", x[5]);
-		ALCHbUnaryIndividual f_x_6 = factory.unaryInd("f", x[6]);
-		ALCHbUnaryIndividual f_x_7 = factory.unaryInd("f", x[7]);
+		ALCHbUnaryIndividual f_x_5 = factory.unaryInd("c", x[5]);
+		ALCHbUnaryIndividual f_x_6 = factory.unaryInd("c", x[6]);
+		ALCHbUnaryIndividual f_x_7 = factory.unaryInd("c", x[7]);
 		
-		ALCHbUnaryIndividual g_x_9 = factory.unaryInd("g", x[9]);
-		ALCHbUnaryIndividual g_x_11 = factory.unaryInd("g", x[11]);
-		ALCHbUnaryIndividual g_x_13 = factory.unaryInd("g", x[13]);
+		ALCHbUnaryIndividual g_x_9 = factory.unaryInd("d", x[9]);
+		ALCHbUnaryIndividual g_x_11 = factory.unaryInd("d", x[11]);
+		ALCHbUnaryIndividual g_x_13 = factory.unaryInd("d", x[13]);
 		
-		ALCHbUnaryIndividual h_x_10 = factory.unaryInd("h", x[10]);
-		ALCHbUnaryIndividual h_x_12 = factory.unaryInd("h", x[12]);
-		ALCHbUnaryIndividual h_x_14 = factory.unaryInd("h", x[14]);
+		ALCHbUnaryIndividual h_x_10 = factory.unaryInd("e", x[10]);
+		ALCHbUnaryIndividual h_x_12 = factory.unaryInd("e", x[12]);
+		ALCHbUnaryIndividual h_x_14 = factory.unaryInd("e", x[14]);
 		
 		Collection<Collection<ALCHbLiteral>> matrix = factory.matrixOf(
 			// \exists s . B \sub N
@@ -358,6 +361,8 @@ public class ALCHbProverTest {
 		ProofTree<ALCHbLiteral> proof = prover.prove(matrix);
 		
 		assertTrue(proof instanceof StartProofTree<?>);
+		Collections.reverse((List<Collection<ALCHbLiteral>>)matrix);
+		System.out.println(LaTeXMatrixVisitor.<ALCHbLiteral>getLatexMatrixOf(matrix));
 		System.out.println(proof.latexString());
 	}
 
