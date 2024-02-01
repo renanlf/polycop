@@ -22,10 +22,4 @@ public class PropositionalConnectionStrategy implements ConnectionStrategy<Strin
 	public void setState(Void state) {
 	}
 
-	@Override
-	public Void getSubstitution(Void term) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

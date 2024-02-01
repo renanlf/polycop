@@ -180,8 +180,7 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 		}
 	}
 	
-	@Override
-	public ALCHbTerm getSubstitution(ALCHbTerm term) {
+	private ALCHbTerm getSubstitution(ALCHbTerm term) {
 		while (subs.containsKey(term)) {
 			term = subs.get(term);
 		}
