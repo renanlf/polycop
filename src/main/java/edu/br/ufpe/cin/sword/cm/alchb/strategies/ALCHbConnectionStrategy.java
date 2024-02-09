@@ -17,7 +17,7 @@ import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbUnaryIndividual;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbVariable;
 import edu.br.ufpe.cin.sword.cm.strategies.ConnectionStrategy;
 
-public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral, ALCHbTerm, Map<ALCHbVariable, ALCHbTerm>> {
+public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral, Map<ALCHbVariable, ALCHbTerm>> {
 
 	private Map<ALCHbVariable, ALCHbTerm> subs;
 	

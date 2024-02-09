@@ -9,7 +9,7 @@ import edu.br.ufpe.cin.sword.cm.propositonal.strategies.PropositionalCopyStrateg
 import edu.br.ufpe.cin.sword.cm.propositonal.strategies.PropositionalHelperStrategy;
 import edu.br.ufpe.cin.sword.cm.prover.SimpleProver;
 
-public class PropositionalProver extends SimpleProver<String, Void, Void, Set<Collection<String>>> {
+public class PropositionalProver extends SimpleProver<String, Void, Set<Collection<String>>> {
 
 	public PropositionalProver() {
 		super(new PropositionalHelperStrategy(),

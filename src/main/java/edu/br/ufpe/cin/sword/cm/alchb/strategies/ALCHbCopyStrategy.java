@@ -22,7 +22,7 @@ import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbUnaryIndividual;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbVariable;
 import edu.br.ufpe.cin.sword.cm.strategies.CopyStrategy;
 
-public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, ALCHbTerm, Map<ALCHbTerm, List<ALCHbTerm>>> {
+public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTerm, List<ALCHbTerm>>> {
 
 	private static final String COPY_SYMBOL = "'";
 	

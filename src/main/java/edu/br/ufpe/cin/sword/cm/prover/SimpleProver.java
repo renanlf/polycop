@@ -14,17 +14,17 @@ import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.ProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.ProofTreeFactory;
 
-public class SimpleProver<Literal, Term, ConnectionState, CopyState> {
+public class SimpleProver<Literal, ConnectionState, CopyState> {
 
-	private final ConnectionStrategy<Literal, Term, ConnectionState> connStrategy;
-	private final CopyStrategy<Literal, Term, CopyState> copyStrategy;
+	private final ConnectionStrategy<Literal, ConnectionState> connStrategy;
+	private final CopyStrategy<Literal, CopyState> copyStrategy;
 	private final LiteralHelperStrategy<Literal> litHelperStrategy;
 	private final BlockingStrategy<Literal, ConnectionState, CopyState> blockingStrategy;
 	private final ProofTreeFactory<Literal> proofFactory;
 
 	public SimpleProver(LiteralHelperStrategy<Literal> litHelperStrategy,
-			ConnectionStrategy<Literal, Term, ConnectionState> connStrategy, 
-			CopyStrategy<Literal, Term, CopyState> copyStrategy,
+			ConnectionStrategy<Literal, ConnectionState> connStrategy, 
+			CopyStrategy<Literal, CopyState> copyStrategy,
 			BlockingStrategy<Literal, ConnectionState, CopyState> blockingStrategy) {
 		super();
 		this.connStrategy = connStrategy;

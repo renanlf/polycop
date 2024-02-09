@@ -7,7 +7,7 @@ import java.util.Set;
 
 import edu.br.ufpe.cin.sword.cm.strategies.CopyStrategy;
 
-public class PropositionalCopyStrategy implements CopyStrategy<String, Void, Set<Collection<String>>> {
+public class PropositionalCopyStrategy implements CopyStrategy<String, Set<Collection<String>>> {
 	
 	private Set<Collection<String>> usedClauses;
 	
