@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.Map;
 
 import edu.br.ufpe.cin.sword.cm.fol.model.FOLLiteral;
-import edu.br.ufpe.cin.sword.cm.fol.model.FOLTerm;
-import edu.br.ufpe.cin.sword.cm.fol.model.FOLVariable;
+import edu.br.ufpe.cin.sword.cm.fol.model.terms.FOLTerm;
+import edu.br.ufpe.cin.sword.cm.fol.model.terms.FOLVariable;
 import edu.br.ufpe.cin.sword.cm.strategies.ConnectionStrategy;
 
 public class FOLConnectionStrategy implements ConnectionStrategy<FOLLiteral, Map<FOLVariable, FOLTerm>> {

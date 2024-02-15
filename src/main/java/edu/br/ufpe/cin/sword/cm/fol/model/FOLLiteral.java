@@ -3,6 +3,8 @@ package edu.br.ufpe.cin.sword.cm.fol.model;
 import java.util.List;
 import java.util.stream.Stream;
 
+import edu.br.ufpe.cin.sword.cm.fol.model.terms.FOLTerm;
+
 public class FOLLiteral {
 
     private List<FOLTerm> terms;

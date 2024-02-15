@@ -64,13 +64,11 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 
 		// TODO: to implement a sort strategy to get next literal
 		Literal literal = clause.stream().findAny().get();
-
 		ConnectionState connState = connStrategy.getState();
 		for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, path)) {
 			if (connStrategy.connect(literal, negLiteral)) {	
 
 				ProofTree<Literal> subProof = proveClause(minus(clause, literal), matrix, path);
-
 				if (!(subProof instanceof FailProofTree)) {
 					return proofFactory.red(clause, path, subProof);
 				}
