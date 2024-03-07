@@ -21,8 +21,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenDifferentPredicate() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"));
-        FOLLiteral other = new FOLLiteral("B", false, FOLTermFactory.variable("y"));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"));
+        FOLLiteral other = FOLLiteral.of("B", false, FOLTermFactory.variable("y"));
 
         assertFalse(connStrategy.connect(literal, other));
     }
@@ -31,8 +31,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionSamePredicateSamePositive() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"));
-        FOLLiteral other = new FOLLiteral("A", true, FOLTermFactory.variable("y"));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"));
+        FOLLiteral other = FOLLiteral.of("A", true, FOLTermFactory.variable("y"));
 
         assertFalse(connStrategy.connect(literal, other));
     }
@@ -41,8 +41,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenLiteralsDifferentTermsSize() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.variable("y"), FOLTermFactory.variable("z"));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.variable("y"), FOLTermFactory.variable("z"));
 
         assertFalse(connStrategy.connect(literal, other));
     }
@@ -51,8 +51,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenVariables() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.variable("y"));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.variable("y"));
 
         assertTrue(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
@@ -66,8 +66,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenMultipleVariables() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"), FOLTermFactory.variable("z"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.variable("y"), FOLTermFactory.variable("k"));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"), FOLTermFactory.variable("z"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.variable("y"), FOLTermFactory.variable("k"));
 
         assertTrue(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
@@ -82,8 +82,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenVariableAndGroundTerm() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.groundTerm("a"));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.groundTerm("a"));
 
         assertTrue(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
@@ -97,8 +97,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenGroundTermAndGroundTerm() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.groundTerm("a"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.groundTerm("b"));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.groundTerm("a"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.groundTerm("b"));
 
         assertFalse(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
@@ -109,8 +109,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenGroundTermAndGroundTermWithSameName() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.groundTerm("a"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.groundTerm("a"));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.groundTerm("a"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.groundTerm("a"));
 
         assertTrue(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
@@ -121,8 +121,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenVariableAndFunction() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.function("f", FOLTermFactory.variable("y")));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.function("f", FOLTermFactory.variable("y")));
 
         assertTrue(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
@@ -134,8 +134,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenVariableAndFunctionOccursCheck() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.function("f", FOLTermFactory.variable("x")));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.function("f", FOLTermFactory.variable("x")));
 
         assertFalse(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
@@ -146,8 +146,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenVariableAndFunctionOccursCheckDeeper() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.function("f", FOLTermFactory.function("g", FOLTermFactory.function("h", FOLTermFactory.variable("x")))));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.function("f", FOLTermFactory.function("g", FOLTermFactory.function("h", FOLTermFactory.variable("x")))));
 
         assertFalse(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
@@ -159,8 +159,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenVariableAndFunctionDeeper() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.function("f", FOLTermFactory.function("g", FOLTermFactory.function("h", FOLTermFactory.variable("y")))));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.function("f", FOLTermFactory.function("g", FOLTermFactory.function("h", FOLTermFactory.variable("y")))));
 
         assertTrue(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
@@ -171,8 +171,8 @@ public class FOLConnectionStrategyTest {
     public void testConnectionBetweenMultipleVariableAndFunction() {
         FOLConnectionStrategy connStrategy = new FOLConnectionStrategy();
 
-        FOLLiteral literal = new FOLLiteral("A", true, FOLTermFactory.variable("x"), FOLTermFactory.variable("y"));
-        FOLLiteral other = new FOLLiteral("A", false, FOLTermFactory.groundTerm("a"), FOLTermFactory.function("f", FOLTermFactory.variable("x")));
+        FOLLiteral literal = FOLLiteral.of("A", true, FOLTermFactory.variable("x"), FOLTermFactory.variable("y"));
+        FOLLiteral other = FOLLiteral.of("A", false, FOLTermFactory.groundTerm("a"), FOLTermFactory.function("f", FOLTermFactory.variable("x")));
 
         assertTrue(connStrategy.connect(literal, other));
         Map<FOLVariable, FOLTerm> subs = connStrategy.getState();
