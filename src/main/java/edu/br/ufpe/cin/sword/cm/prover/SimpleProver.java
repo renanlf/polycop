@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import edu.br.ufpe.cin.sword.cm.strategies.BlockingStrategy;
 import edu.br.ufpe.cin.sword.cm.strategies.ConnectionStrategy;
@@ -64,6 +65,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 			Set<Literal> path) {
 		if (clause.isEmpty())
 			return proofFactory.ax(path);
+		}
 
 		// TODO: to implement a sort strategy to get next literal
 		Literal literal = clause.stream().findAny().get();
@@ -74,8 +76,10 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 				ProofTree<Literal> subProof = proveClause(minus(clause, literal), matrix, path);
 
-				if (!(subProof instanceof FailProofTree)) {
+				if (!(subProof instanceof FailProofTree)) {	
 					return proofFactory.red(clause, path, subProof);
+				} else {
+					LOGGER.info("[FAILED] Attempting to Red " + literal);
 				}
 			}
 			connStrategy.setState(connState);
@@ -101,7 +105,11 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 							if (!(subProofRight instanceof FailProofTree)) {
 								return proofFactory.ext(clause, path, subProofLeft, subProofRight);
+							} else {
+								LOGGER.info("[FAILED] Attempting to Ext (Left) " + literal);
 							}
+						} else {
+							LOGGER.info("[FAILED] Attempting to Ext (Right) " + literal);
 						}
 					}
 					// if comes here, then some subProof is failed.
