@@ -1,0 +1,1 @@
+mvn clean jacoco:prepare-agent verify -Dtest=SimpleProverTest install jacoco:report
