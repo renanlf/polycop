@@ -169,4 +169,43 @@ public class SimpleProverTest {
         verify(connStrategy, times(1)).connect(any(), any());
 
     }
+
+    @Test
+    public void testProveWithTwoComplementaryLiteralsInThePath() {
+        // GIVEN
+        DoNothingConnectionStrategy<Integer> connStrategy = spy(DoNothingConnectionStrategy.alwaysConnectStrategy());
+        DoNothingCopyStrategy<Integer> copyStrategy = spy(DoNothingCopyStrategy.alwaysCopyStrategy());
+        DoNothingBlockingStrategy<Integer> blockStrategy = spy(DoNothingBlockingStrategy.neverBlockStrategy());
+        LiteralHelperStrategy<Integer> helperStrategy = mock(LiteralHelperStrategy.class);
+
+        when(helperStrategy.complementaryOf(any(), any(Collection.class))).thenReturn(Set.of(10, 1));
+        when(connStrategy.connect(1, 10)).thenReturn(false);
+
+        SimpleProver<Integer, Void, Void> prover = new SimpleProver<>(
+                helperStrategy,
+                connStrategy,
+                copyStrategy,
+                blockStrategy);
+
+        // WHEN
+        ProofTree<Integer> proof = prover.prove(Set.of(
+                Set.of(1),
+                Set.of(-1)));
+
+        // THEN
+        assertNotNull(proof);
+        assertTrue(proof instanceof StartProofTree);
+        assertTrue(((StartProofTree<Integer>) proof).getChild() instanceof ReductionProofTree);
+        assertTrue(((ReductionProofTree<Integer>) ((StartProofTree<Integer>) proof).getChild())
+                .getChild() instanceof AxiomProofTree);
+        verify(connStrategy, times(1)).clear();
+        verify(copyStrategy, times(1)).clear();
+        verify(copyStrategy, times(1)).getState();
+        verify(copyStrategy, times(1)).copy(any());
+        verify(copyStrategy, times(0)).setState(any());
+
+        verify(connStrategy, times(1)).getState();
+        verify(connStrategy, times(2)).connect(any(), any());
+
+    }
 }
