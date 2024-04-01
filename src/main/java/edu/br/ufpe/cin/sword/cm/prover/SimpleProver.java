@@ -35,6 +35,10 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 	}
 
 	public ProofTree<Literal> prove(Collection<Collection<Literal>> matrix) {
+		if (matrix == null || matrix.isEmpty()) {
+			return proofFactory.ax(Set.of());
+		}
+
 		connStrategy.clear();
 		copyStrategy.clear();
 
@@ -47,7 +51,6 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 				ProofTree<Literal> proof = proveClause(copyClause.get(), matrix, Collections.emptySet());
 
 				if (!(proof instanceof FailProofTree)) {
-					System.out.println(connStrategy.getState());
 					return proofFactory.st(copyClause.get(), Collections.emptySet(), proof);
 				}
 					
