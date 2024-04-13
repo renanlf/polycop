@@ -58,7 +58,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 		for (List<Literal> clause : matrix) {
 			Optional<List<Literal>> copyClause = copyStrategy.copy(clause);
 
-			if (copyClause.isPresent()) {
+			if (copyClause.isPresent() && !copyClause.get().isEmpty()) {
 
 				ProofTree<Literal> proof = proveClause(copyClause.get(), matrix, Set.of());
 
