@@ -5,7 +5,14 @@ import java.util.Optional;
 
 public interface CopyStrategy<Literal, CopyState> {
 	Optional<Collection<Literal>> copy(Collection<Literal> clause);
-	void clear();
-	CopyState getState();
-	void setState(CopyState state);
+
+	default void clear() {
+	}
+
+	default CopyState getState() {
+		return null;
+	}
+
+	default void setState(CopyState state) {
+	}
 }

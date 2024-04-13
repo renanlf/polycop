@@ -22,8 +22,9 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 	private final BlockingStrategy<Literal, ConnectionState, CopyState> blockingStrategy;
 	private final ProofTreeFactory<Literal> proofFactory;
 
-	public SimpleProver(ConnectionStrategy<Literal, ConnectionState> connStrategy,
-			CopyStrategy<Literal, CopyState> copyStrategy, LiteralHelperStrategy<Literal> litHelperStrategy,
+	public SimpleProver(LiteralHelperStrategy<Literal> litHelperStrategy,
+			ConnectionStrategy<Literal, ConnectionState> connStrategy,
+			CopyStrategy<Literal, CopyState> copyStrategy,
 			BlockingStrategy<Literal, ConnectionState, CopyState> blockingStrategy,
 			ProofTreeFactory<Literal> proofFactory) {
 		this.connStrategy = connStrategy;
@@ -34,7 +35,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 	}
 
 	public SimpleProver(LiteralHelperStrategy<Literal> litHelperStrategy,
-			ConnectionStrategy<Literal, ConnectionState> connStrategy, 
+			ConnectionStrategy<Literal, ConnectionState> connStrategy,
 			CopyStrategy<Literal, CopyState> copyStrategy,
 			BlockingStrategy<Literal, ConnectionState, CopyState> blockingStrategy) {
 		super();
@@ -64,15 +65,16 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 				if (!(proof instanceof FailProofTree)) {
 					return proofFactory.st(copyClause.get(), Collections.emptySet(), proof);
 				}
-					
+
 				copyStrategy.setState(copyState);
 			}
 		}
-		
+
 		return proofFactory.fail(null, null);
 	}
 
-	private ProofTree<Literal> proveClause(Collection<Literal> clause, Collection<Collection<Literal>> matrix, Set<Literal> path) {		
+	private ProofTree<Literal> proveClause(Collection<Literal> clause, Collection<Collection<Literal>> matrix,
+			Set<Literal> path) {
 		if (clause.isEmpty())
 			return proofFactory.ax(path);
 
@@ -81,7 +83,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 
 		ConnectionState connState = connStrategy.getState();
 		for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, path)) {
-			if (connStrategy.connect(literal, negLiteral)) {	
+			if (connStrategy.connect(literal, negLiteral)) {
 
 				ProofTree<Literal> subProof = proveClause(minus(clause, literal), matrix, path);
 
@@ -99,16 +101,17 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 
 			if (copyClause.isPresent()) {
 				for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, copyClause.get())) {
-					
-					if (connStrategy.connect(literal, negLiteral) 
-							&& !blockingStrategy.isBlocked(negLiteral, path, connStrategy.getState(), copyStrategy.getState())) {
-					
+
+					if (connStrategy.connect(literal, negLiteral)
+							&& !blockingStrategy.isBlocked(negLiteral, path, connStrategy.getState(),
+									copyStrategy.getState())) {
+
 						ProofTree<Literal> subProofLeft = proveClause(minus(copyClause.get(), negLiteral), matrix,
 								add(path, literal));
-	
+
 						if (!(subProofLeft instanceof FailProofTree)) {
 							ProofTree<Literal> subProofRight = proveClause(minus(clause, literal), matrix, path);
-	
+
 							if (!(subProofRight instanceof FailProofTree)) {
 								return proofFactory.ext(clause, path, subProofLeft, subProofRight);
 							}
