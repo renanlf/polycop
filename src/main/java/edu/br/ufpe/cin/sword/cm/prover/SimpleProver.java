@@ -22,6 +22,17 @@ public class SimpleProver<Literal, ConnectionState, CopyState> {
 	private final BlockingStrategy<Literal, ConnectionState, CopyState> blockingStrategy;
 	private final ProofTreeFactory<Literal> proofFactory;
 
+	public SimpleProver(ConnectionStrategy<Literal, ConnectionState> connStrategy,
+			CopyStrategy<Literal, CopyState> copyStrategy, LiteralHelperStrategy<Literal> litHelperStrategy,
+			BlockingStrategy<Literal, ConnectionState, CopyState> blockingStrategy,
+			ProofTreeFactory<Literal> proofFactory) {
+		this.connStrategy = connStrategy;
+		this.copyStrategy = copyStrategy;
+		this.litHelperStrategy = litHelperStrategy;
+		this.blockingStrategy = blockingStrategy;
+		this.proofFactory = proofFactory;
+	}
+
 	public SimpleProver(LiteralHelperStrategy<Literal> litHelperStrategy,
 			ConnectionStrategy<Literal, ConnectionState> connStrategy, 
 			CopyStrategy<Literal, CopyState> copyStrategy,
