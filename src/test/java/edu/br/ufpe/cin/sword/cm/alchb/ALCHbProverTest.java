@@ -284,7 +284,7 @@ public class ALCHbProverTest {
 		ALCHbUnaryIndividual h_x_12 = factory.unaryInd("e", x[12]);
 		ALCHbUnaryIndividual h_x_14 = factory.unaryInd("e", x[14]);
 		
-		Collection<Collection<ALCHbLiteral>> matrix = factory.matrixOf(
+		List<List<ALCHbLiteral>> matrix = factory.matrixOf(
 			// \exists s . B \sub N
 			factory.clauseOf(
 					factory.roleLiteral("s", true, x[0], x[1]),
@@ -361,7 +361,7 @@ public class ALCHbProverTest {
 		ProofTree<ALCHbLiteral> proof = prover.prove(matrix);
 		
 		assertTrue(proof instanceof StartProofTree<?>);
-		Collections.reverse((List<Collection<ALCHbLiteral>>)matrix);
+		Collections.reverse((List<List<ALCHbLiteral>>)matrix);
 		System.out.println(LaTeXMatrixVisitor.<ALCHbLiteral>getLatexMatrixOf(matrix));
 		System.out.println(proof.latexString());
 	}

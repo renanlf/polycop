@@ -1,8 +1,6 @@
 package edu.br.ufpe.cin.sword.cm.alchb.strategies;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +33,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 	}
 
 	@Override
-	public Optional<Collection<ALCHbLiteral>> copy(Collection<ALCHbLiteral> clause) {
+	public Optional<List<ALCHbLiteral>> copy(List<ALCHbLiteral> clause) {
 
 		// "open" map to add new copies
 		copies = new HashMap<>(copies);
@@ -66,12 +64,12 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 		termsMap.putAll(unIndMap);
 		
 		// get the new clause
-		Set<ALCHbLiteral> copiedClause = clause.stream()
+		List<ALCHbLiteral> copiedClause = clause.stream()
 				.map(l -> copyLiteral(l, termsMap))
-				.collect(Collectors.toSet());
+				.collect(Collectors.toList());
 		
 		// "closes" the map after adding copies
-		copies = Collections.unmodifiableMap(copies);
+		copies = Map.copyOf(copies);
 		
 		return Optional.of(copiedClause);
 		
@@ -81,7 +79,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 		var = var.getCopyOf() == null ? var : (ALCHbVariable) var.getCopyOf();
 				
 		if (!copies.containsKey(var))
-			copies.put(var, Collections.emptyList());
+			copies.put(var, List.of());
 
 		// "opens" the list to add new copies
 		List<ALCHbTerm> copiesList = new ArrayList<>(copies.get(var));
@@ -93,7 +91,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 		copiesList.add(newVar);
 		
 		// "closes" the list and adds it to the map
-		copies.put(var, Collections.unmodifiableList(copiesList));
+		copies.put(var, List.copyOf(copiesList));
 		
 		return newVar;
 	}
@@ -102,7 +100,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 		term = term.getCopyOf() == null ? term : (ALCHbUnaryIndividual) term.getCopyOf();
 		
 		if (!copies.containsKey(term))
-			copies.put(term, Collections.emptyList());
+			copies.put(term, List.of());
 
 		// "opens" the list to add new copies
 		List<ALCHbTerm> copiesList = new ArrayList<>(copies.get(term));
@@ -114,7 +112,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 		copiesList.add(newUnaryInd);
 
 		// "closes" the list and adds it to the map
-		copies.put(term, Collections.unmodifiableList(copiesList));
+		copies.put(term, List.copyOf(copiesList));
 		
 		return newUnaryInd;
 	}
@@ -153,7 +151,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 
 	@Override
 	public void clear() {
-		copies = Collections.emptyMap();
+		copies = Map.of();
 	}
 
 	@Override
@@ -163,7 +161,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 
 	@Override
 	public void setState(Map<ALCHbTerm, List<ALCHbTerm>> state) {
-		copies = Collections.unmodifiableMap(new HashMap<>(state));
+		copies = state;
 	}
 
 }

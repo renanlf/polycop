@@ -1,11 +1,11 @@
 package edu.br.ufpe.cin.sword.cm.alchb.visitor;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class LaTeXMatrixVisitor {
 	
-	public static <Literal> String  getLatexMatrixOf(Collection<Collection<Literal>> matrix) {
+	public static <Literal> String  getLatexMatrixOf(List<List<Literal>> matrix) {
 		
 		String prefix = "$\\cmatrix{";
 		String suffix = "}{}$";

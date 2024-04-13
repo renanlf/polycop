@@ -2,6 +2,7 @@ package edu.br.ufpe.cin.sword.cm.propositonal.strategies;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,7 +17,7 @@ public class PropositionalCopyStrategy implements CopyStrategy<String, Set<Colle
 	}
 
 	@Override
-	public Optional<Collection<String>> copy(Collection<String> clause) {
+	public Optional<List<String>> copy(List<String> clause) {
 		if(usedClauses.contains(clause)) {
 			return Optional.empty();
 		}
