@@ -1,11 +1,6 @@
 package edu.br.ufpe.cin.sword.cm.alchb.factories;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbBiOrderedLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbConceptLiteral;
@@ -55,20 +50,13 @@ public class ALCHbFactory {
 		return new ALCHbBiOrderedLiteral(positive, first, second, third, fourth);
 	}
 	
-	public Set<ALCHbLiteral> clauseOf(ALCHbLiteral ...literals) {
-		return Stream.of(literals).collect(Collectors.toSet());
+	public List<ALCHbLiteral> clauseOf(ALCHbLiteral ...literals) {
+		return List.of(literals);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Collection<Collection<ALCHbLiteral>> matrixOf(Set<ALCHbLiteral> ...clauses) {
-		List<Collection<ALCHbLiteral>> list = Stream.of(clauses)
-				.collect(Collectors.toList());
-		
-		Collections.reverse(list);
-		
-		Collection<Collection<ALCHbLiteral>> collection = list;
-		
-		return collection;
+	public List<List<ALCHbLiteral>> matrixOf(List<ALCHbLiteral> ...clauses) {
+		return List.of(clauses);
 	}
 
 }

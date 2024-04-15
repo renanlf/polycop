@@ -1,6 +1,5 @@
 package edu.br.ufpe.cin.sword.cm.alchb.strategies;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,7 +23,7 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 	private static final ALCHbVariable NULL_VAR = new ALCHbVariable("null");
 
 	public ALCHbConnectionStrategy() {
-		this.subs = Collections.emptyMap();
+		this.subs = Map.of();
 	}
 
 	@Override
@@ -56,7 +55,7 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 			return false;
 		
 		if(entry.getKey() != NULL_VAR)
-			putEntries(Collections.singleton(entry));
+			putEntries(Set.of(entry));
 		
 		return true;
 	}
@@ -176,7 +175,7 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 		if(!entries.isEmpty()) {
 			subs = new HashMap<>(subs);
 			entries.forEach(e -> subs.put(e.getKey(), e.getValue()));
-			subs = Collections.unmodifiableMap(subs);
+			subs = Map.copyOf(subs);
 		}
 	}
 	
@@ -190,7 +189,7 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 
 	@Override
 	public void clear() {
-		subs = Collections.emptyMap();
+		subs = Map.of();
 	}
 
 	@Override

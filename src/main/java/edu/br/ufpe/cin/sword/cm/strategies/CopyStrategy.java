@@ -1,11 +1,18 @@
 package edu.br.ufpe.cin.sword.cm.strategies;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface CopyStrategy<Literal, CopyState> {
-	Optional<Collection<Literal>> copy(Collection<Literal> clause);
-	void clear();
-	CopyState getState();
-	void setState(CopyState state);
+	Optional<List<Literal>> copy(List<Literal> clause);
+
+	default void clear() {
+	}
+
+	default CopyState getState() {
+		return null;
+	}
+
+	default void setState(CopyState state) {
+	}
 }
