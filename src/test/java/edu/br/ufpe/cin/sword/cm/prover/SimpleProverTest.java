@@ -1,6 +1,7 @@
 package edu.br.ufpe.cin.sword.cm.prover;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -103,7 +104,21 @@ public class SimpleProverTest {
 
     @Test
     public void proveWithTwoComplementarySingletonClauses_ExpectExtAndAx() {
+        // GIVEN
+        List<List<Integer>> matrix = List.of(
+            List.of(1),
+            List.of(-1));
 
+        // WHEN
+        prover.prove(matrix);
+
+        // THEN
+        verify(proofTreeFactory, times(1)).ax(Set.of());
+        verify(proofTreeFactory, times(1)).ax(Set.of(1));
+        verify(proofTreeFactory, times(1)).st(eq(List.of(1)), eq(Set.of()), any());
+        verify(proofTreeFactory, times(0)).red(any(), any(), any());
+        verify(proofTreeFactory, times(1)).ext(eq(List.of(1)), any(), any(), any());
+        verify(proofTreeFactory, times(0)).fail(any(), any());
     }
 
     @Test

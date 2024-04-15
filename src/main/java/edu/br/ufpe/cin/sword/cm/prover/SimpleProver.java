@@ -96,7 +96,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 		CopyState copyState = copyStrategy.getState();
 
-		for (List<Literal> matrixClause : matrix) {
+		for (List<Literal> matrixClause : litHelperStrategy.complementaryOf(literal, matrix)) {
 			Optional<List<Literal>> copyClause = copyStrategy.copy(matrixClause);
 
 			if (copyClause.isPresent()) {
