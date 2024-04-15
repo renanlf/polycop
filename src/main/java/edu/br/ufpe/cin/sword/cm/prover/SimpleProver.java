@@ -25,20 +25,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 	public SimpleProver(LiteralHelperStrategy<Literal> litHelperStrategy,
 			ConnectionStrategy<Literal, ConnectionState> connStrategy,
 			CopyStrategy<Literal, CopyState> copyStrategy,
-			BlockingStrategy<Literal, ConnectionState, CopyState> blockingStrategy,
-			ProofTreeFactory<Literal> proofFactory) {
-		this.connStrategy = connStrategy;
-		this.copyStrategy = copyStrategy;
-		this.litHelperStrategy = litHelperStrategy;
-		this.blockingStrategy = blockingStrategy;
-		this.proofFactory = proofFactory;
-	}
-
-	public SimpleProver(LiteralHelperStrategy<Literal> litHelperStrategy,
-			ConnectionStrategy<Literal, ConnectionState> connStrategy,
-			CopyStrategy<Literal, CopyState> copyStrategy,
 			BlockingStrategy<Literal, ConnectionState, CopyState> blockingStrategy) {
-		super();
 		this.connStrategy = connStrategy;
 		this.copyStrategy = copyStrategy;
 		this.litHelperStrategy = litHelperStrategy;

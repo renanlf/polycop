@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,16 +23,16 @@ public class SimpleProverTest {
     private ProofTreeFactory<Integer> proofTreeFactory;
 
     @Before
-    public void setUp() {
+    public void setUp() throws IllegalAccessException {
         proofTreeFactory = spy(new ProofTreeFactory<>());
 
         prover = new SimpleProver<Integer, Void, Void>(
-            (literal, other) -> literal == -other, 
-            (literal, other) -> literal == -other,
-            (clause) -> Optional.of(clause), 
-            (literal, clause, connState, copyState) -> false,
-            proofTreeFactory
-        );
+                (literal, other) -> literal == -other,
+                (literal, other) -> literal == -other,
+                (clause) -> Optional.of(clause),
+                (literal, clause, connState, copyState) -> false);
+
+        FieldUtils.writeField(prover, "proofFactory", proofTreeFactory, true);
     }
 
     @Test
@@ -106,8 +107,8 @@ public class SimpleProverTest {
     public void proveWithTwoComplementarySingletonClauses_ExpectExtAndAx() {
         // GIVEN
         List<List<Integer>> matrix = List.of(
-            List.of(1),
-            List.of(-1));
+                List.of(1),
+                List.of(-1));
 
         // WHEN
         prover.prove(matrix);
@@ -122,12 +123,64 @@ public class SimpleProverTest {
     }
 
     @Test
-    public void proveWithTwoClausesButOneHasNoComplementaryLiteral_ExpectExtAndFail() {
+    public void proveWithTwoClausesButOneHasNoComplementaryLiteral_ExpectTryEveryClauseAndFail() {
+        // GIVEN
+        List<List<Integer>> matrix = List.of(
+                List.of(1),
+                List.of(-1, 2));
 
+        // WHEN
+        prover.prove(matrix);
+
+        // THEN
+        verify(proofTreeFactory, times(1)).fail(List.of(2), Set.of(1));
+        verify(proofTreeFactory, times(1)).fail(List.of(1), Set.of());
+
+        verify(proofTreeFactory, times(1)).ax(Set.of(-1));
+        verify(proofTreeFactory, times(1)).fail(List.of(2), Set.of());
+        verify(proofTreeFactory, times(1)).fail(List.of(-1, 2), Set.of());
+
+        verify(proofTreeFactory, times(0)).st(any(), any(), any());
+        verify(proofTreeFactory, times(0)).red(any(), any(), any());
+        verify(proofTreeFactory, times(0)).ext(any(), any(), any(), any());
     }
 
     @Test
     public void proveWithComplementaryLiteralInThePath_ExpectRed() {
+        // GIVEN
+        List<List<Integer>> matrix = List.of(
+                List.of(1),
+                List.of(-1, 2),
+                List.of(-2, -1));
+
+        // WHEN
+        prover.prove(matrix);
+
+        // THEN
+
+        verify(proofTreeFactory, times(1)).red(any(), any(), any());
+        verify(proofTreeFactory, times(3)).ax(any());
+        verify(proofTreeFactory, times(2)).ext(any(), any(), any(), any());
+        verify(proofTreeFactory, times(1)).st(any(), any(), any());
+
+        verify(proofTreeFactory, times(0)).fail(any(), any());
+
+    }
+
+    @Test
+    public void proveWithComplementaryLiteralInThePath_ExpectRedAndFail() {
+        // GIVEN
+        List<List<Integer>> matrix = List.of(
+                List.of(1),
+                List.of(-1, 2, 5),
+                List.of(-2, -1));
+
+        // WHEN
+        prover.prove(matrix);
+
+        // THEN
+        verify(proofTreeFactory, times(1)).red(any(), any(), any());
+        verify(proofTreeFactory, times(1)).fail(List.of(5), Set.of(1));
 
     }
 
