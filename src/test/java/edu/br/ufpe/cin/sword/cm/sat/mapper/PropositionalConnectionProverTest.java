@@ -15,7 +15,7 @@ public class PropositionalConnectionProverTest {
 
     @Test
     public void testFile00001() throws IOException, FileParserException {
-        File file = new File("src/test/resources/sat/test_00001.cnf");
+        File file = new File("src/test/resources/propositional/test_00001.cnf");
         PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
         assertFalse(prover.unsat(file));
@@ -23,7 +23,7 @@ public class PropositionalConnectionProverTest {
 
     @Test
     public void testFile00002() throws IOException, FileParserException {
-        File file = new File("src/test/resources/sat/test_00002.cnf");
+        File file = new File("src/test/resources/propositional/test_00002.cnf");
         PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
         assertTrue(prover.unsat(file));
@@ -31,7 +31,7 @@ public class PropositionalConnectionProverTest {
 
     @Test
     public void testFile00003() throws IOException, FileParserException {
-        File file = new File("src/test/resources/sat/test_00003.cnf");
+        File file = new File("src/test/resources/propositional/test_00003.cnf");
         PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
         assertTrue(prover.unsat(file));
@@ -41,7 +41,7 @@ public class PropositionalConnectionProverTest {
 
     @Test
     public void testFileDubois20() throws IOException, FileParserException {
-        File file = new File("src/test/resources/sat/dubois20.cnf");
+        File file = new File("src/test/resources/propositional/dubois20.cnf");
         PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
         assertTrue(prover.unsat(file));
