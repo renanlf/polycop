@@ -6,36 +6,39 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import edu.br.ufpe.cin.sword.cm.node.LinkedNode;
 import edu.br.ufpe.cin.sword.cm.strategies.CopyStrategy;
 
-public class SATCopyStrategy implements CopyStrategy<Integer, List<Collection<Integer>>> {
+public class SATCopyStrategy implements CopyStrategy<Integer, LinkedNode<Collection<Integer>>> {
 
-    private List<Collection<Integer>> clausesUsed;
+    private LinkedNode<Collection<Integer>> clausesUsed;
 
     @Override
     public Optional<Collection<Integer>> copy(Collection<Integer> clause) {
-        if (clausesUsed.contains(clause)) 
-            return Optional.empty();
+        if (clausesUsed != null) {        
+            if (clausesUsed.contains(clause)) 
+                return Optional.empty();
 
-        var modifiableList = new ArrayList<>(clausesUsed);
-        modifiableList.add(clause);
-        setState(List.copyOf(modifiableList));
+            clausesUsed = clausesUsed.push(clause);
+        } else {
+            clausesUsed = new LinkedNode<Collection<Integer>>(clause);
+        }
 
-        return Optional.of(clause);
+        return Optional.of(clause);        
     }
 
     @Override
     public void clear() { 
-        clausesUsed = Collections.emptyList();
+        clausesUsed = null;
     }
 
     @Override
-    public List<Collection<Integer>> getState() {
+    public LinkedNode<Collection<Integer>> getState() {
         return clausesUsed;
     }
 
     @Override
-    public void setState(List<Collection<Integer>> state) {
+    public void setState(LinkedNode<Collection<Integer>> state) {
         this.clausesUsed = state;
     }
 

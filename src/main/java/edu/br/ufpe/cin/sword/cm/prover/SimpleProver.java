@@ -81,8 +81,8 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 				} else {
 					LOGGER.info("[FAILED] Attempting to Red " + literal);
 				}
+				connStrategy.setState(connState);
 			}
-			connStrategy.setState(connState);
 		}
 
 		CopyState copyState = copyStrategy.getState();
@@ -93,9 +93,9 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 			if (copyClause.isPresent()) {
 				for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, copyClause.get())) {
 
-					if (connStrategy.connect(literal, negLiteral)
-							&& !blockingStrategy.isBlocked(negLiteral, path, connStrategy.getState(),
-									copyStrategy.getState())) {
+					if (connStrategy.connect(literal, negLiteral)) {
+						if (!blockingStrategy.isBlocked(negLiteral, path, connStrategy.getState(),
+								copyStrategy.getState())) {
 
 						ProofTree<Literal> subProofLeft = proveClause(minus(copyClause.get(), negLiteral), matrix,
 								add(path, literal));
