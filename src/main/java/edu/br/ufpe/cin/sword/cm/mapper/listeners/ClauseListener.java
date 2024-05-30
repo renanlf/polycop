@@ -1,9 +1,9 @@
 package edu.br.ufpe.cin.sword.cm.mapper.listeners;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface ClauseListener<Literal> {
 
-    void onClauseMap(Collection<Literal> clause);
+    void onClauseMap(List<Literal> clause);
 
 }

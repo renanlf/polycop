@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -27,7 +28,7 @@ public class DimacsCNFMatrixMapper implements MatrixMapper<Integer> {
     }
 
     @Override
-    public Collection<Collection<Integer>> map(File file) throws IOException, FileParserException {
+    public List<List<Integer>> map(File file) throws IOException, FileParserException {
         Pattern pLinePattern = Pattern.compile("p[\s\t\n]*cnf[\s\t\n]*(\\d+)[\s\t\n]*(\\d+)");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -35,7 +36,7 @@ public class DimacsCNFMatrixMapper implements MatrixMapper<Integer> {
             int numberLiterals;
             int numberClauses;
             boolean readingClauses = false;
-            Collection<Collection<Integer>> matrix = new HashSet<>();
+            List<List<Integer>> matrix = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
                 if (!readingClauses) {
                     Matcher matcher = pLinePattern.matcher(line);
@@ -45,7 +46,7 @@ public class DimacsCNFMatrixMapper implements MatrixMapper<Integer> {
                         readingClauses = true;
                     }
                 } else {
-                    Set<Integer> clause = new HashSet<>();
+                    List<Integer> clause = new ArrayList<>();
                     try (Scanner scanner = new Scanner(line)) {
                         while (scanner.hasNextInt()) {
                             int number = scanner.nextInt();
@@ -79,13 +80,13 @@ public class DimacsCNFMatrixMapper implements MatrixMapper<Integer> {
         matrixListeners.add(matrixListener);
     }
 
-    private void notifyClauseListeners(Set<Integer> clause) {
+    private void notifyClauseListeners(List<Integer> clause) {
         clauseListeners.forEach(clauseListener -> {
             clauseListener.onClauseMap(clause);
         });
     }
 
-    private void notifyMatrixListeners(Collection<Collection<Integer>> matrix) {
+    private void notifyMatrixListeners(List<List<Integer>> matrix) {
         matrixListeners.forEach(matrixListener -> {
             matrixListener.onMatrixMap(matrix);
         });

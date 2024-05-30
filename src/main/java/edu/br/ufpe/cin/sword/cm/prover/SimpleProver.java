@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import edu.br.ufpe.cin.sword.cm.strategies.BlockingStrategy;
 import edu.br.ufpe.cin.sword.cm.strategies.ConnectionStrategy;
@@ -63,9 +62,8 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 	private ProofTree<Literal> proveClause(List<Literal> clause, List<List<Literal>> matrix,
 			Set<Literal> path) {
-		if (clause.isEmpty())
+		if (clause.isEmpty()) 
 			return proofFactory.ax(path);
-		}
 
 		// TODO: to implement a sort strategy to get next literal
 		Literal literal = clause.stream().findAny().get();
@@ -78,8 +76,6 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 				if (!(subProof instanceof FailProofTree)) {	
 					return proofFactory.red(clause, path, subProof);
-				} else {
-					LOGGER.info("[FAILED] Attempting to Red " + literal);
 				}
 				connStrategy.setState(connState);
 			}
@@ -87,35 +83,30 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 		CopyState copyState = copyStrategy.getState();
 
-		for (List<Literal> matrixClause : litHelperStrategy.complementaryOf(literal, matrix)) {
+		for (List<Literal> matrixClause : litHelperStrategy.complementaryOfInMatrix(literal, matrix)) {
 			Optional<List<Literal>> copyClause = copyStrategy.copy(matrixClause);
 
 			if (copyClause.isPresent()) {
 				for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, copyClause.get())) {
-
 					if (connStrategy.connect(literal, negLiteral)) {
 						if (!blockingStrategy.isBlocked(negLiteral, path, connStrategy.getState(),
 								copyStrategy.getState())) {
 
-						ProofTree<Literal> subProofLeft = proveClause(minus(copyClause.get(), negLiteral), matrix,
-								add(path, literal));
+							ProofTree<Literal> subProofLeft = proveClause(minus(copyClause.get(), negLiteral), matrix,
+									add(path, literal));
 
-						if (!(subProofLeft instanceof FailProofTree)) {
-							ProofTree<Literal> subProofRight = proveClause(minus(clause, literal), matrix, path);
+							if (!(subProofLeft instanceof FailProofTree)) {
+								ProofTree<Literal> subProofRight = proveClause(minus(clause, literal), matrix, path);
 
-							if (!(subProofRight instanceof FailProofTree)) {
-								return proofFactory.ext(clause, path, subProofLeft, subProofRight);
-							} else {
-								LOGGER.info("[FAILED] Attempting to Ext (Left) " + literal);
+								if (!(subProofRight instanceof FailProofTree)) {
+									return proofFactory.ext(clause, path, subProofLeft, subProofRight);
+								}
 							}
-						} else {
-							LOGGER.info("[FAILED] Attempting to Ext (Right) " + literal);
 						}
+						// if comes here, then some subProof is failed.
+						connStrategy.setState(connState);
 					}
-					// if comes here, then some subProof is failed.
-					connStrategy.setState(connState);
 				}
-
 				// if comes here, then this copy is failed
 				copyStrategy.setState(copyState);
 			}

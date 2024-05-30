@@ -2,7 +2,7 @@ package edu.br.ufpe.cin.sword.cm.propositional;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 
 import edu.br.ufpe.cin.sword.cm.mapper.exceptions.FileParserException;
 import edu.br.ufpe.cin.sword.cm.node.LinkedNode;
@@ -17,7 +17,7 @@ import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
 public class PropositionalConnectionProver {
     private PropositionalLiteralHelperStrategy helperStrategy;
 
-    private SimpleProver<Integer, Void, LinkedNode<Collection<Integer>>> prover;
+    private SimpleProver<Integer, Void, LinkedNode<List<Integer>>> prover;
 
     public PropositionalConnectionProver() {
         this.helperStrategy = new PropositionalLiteralHelperStrategy();

@@ -1,24 +1,24 @@
 package edu.br.ufpe.cin.sword.cm.propositional.strategies;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import edu.br.ufpe.cin.sword.cm.node.LinkedNode;
 import edu.br.ufpe.cin.sword.cm.strategies.CopyStrategy;
 
-public class PropositionalCopyStrategy implements CopyStrategy<Integer, LinkedNode<Collection<Integer>>> {
+public class PropositionalCopyStrategy implements CopyStrategy<Integer, LinkedNode<List<Integer>>> {
 
-    private LinkedNode<Collection<Integer>> clausesUsed;
+    private LinkedNode<List<Integer>> clausesUsed;
 
     @Override
-    public Optional<Collection<Integer>> copy(Collection<Integer> clause) {
+    public Optional<List<Integer>> copy(List<Integer> clause) {
         if (clausesUsed != null) {        
             if (clausesUsed.contains(clause)) 
                 return Optional.empty();
 
             clausesUsed = clausesUsed.push(clause);
         } else {
-            clausesUsed = new LinkedNode<Collection<Integer>>(clause);
+            clausesUsed = new LinkedNode<List<Integer>>(clause);
         }
 
         return Optional.of(clause);        
@@ -30,12 +30,12 @@ public class PropositionalCopyStrategy implements CopyStrategy<Integer, LinkedNo
     }
 
     @Override
-    public LinkedNode<Collection<Integer>> getState() {
+    public LinkedNode<List<Integer>> getState() {
         return clausesUsed;
     }
 
     @Override
-    public void setState(LinkedNode<Collection<Integer>> state) {
+    public void setState(LinkedNode<List<Integer>> state) {
         this.clausesUsed = state;
     }
 

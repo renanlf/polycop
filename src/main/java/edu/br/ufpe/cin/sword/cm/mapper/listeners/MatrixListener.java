@@ -1,9 +1,9 @@
 package edu.br.ufpe.cin.sword.cm.mapper.listeners;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface MatrixListener<Literal> {
 
-    void onMatrixMap(Collection<Collection<Literal>> matrix);
+    void onMatrixMap(List<List<Literal>> matrix);
 
 }
