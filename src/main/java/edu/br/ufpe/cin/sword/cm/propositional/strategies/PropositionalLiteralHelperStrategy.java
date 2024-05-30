@@ -1,4 +1,4 @@
-package edu.br.ufpe.cin.sword.cm.sat.strategies;
+package edu.br.ufpe.cin.sword.cm.propositional.strategies;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,11 +10,11 @@ import edu.br.ufpe.cin.sword.cm.mapper.listeners.ClauseListener;
 import edu.br.ufpe.cin.sword.cm.mapper.listeners.MatrixListener;
 import edu.br.ufpe.cin.sword.cm.strategies.LiteralHelperStrategy;
 
-public class SATLiteralHelperStrategy implements LiteralHelperStrategy<Integer>, ClauseListener<Integer>, MatrixListener<Integer> {
+public class PropositionalLiteralHelperStrategy implements LiteralHelperStrategy<Integer>, ClauseListener<Integer>, MatrixListener<Integer> {
 
     private Map<Integer, Set<Collection<Integer>>> clausesComplementaryLiterals;
 
-    public SATLiteralHelperStrategy() {
+    public PropositionalLiteralHelperStrategy() {
         this.clausesComplementaryLiterals = new HashMap<>();
     }
 

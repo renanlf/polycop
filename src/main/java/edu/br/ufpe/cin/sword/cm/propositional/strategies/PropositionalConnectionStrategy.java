@@ -1,8 +1,8 @@
-package edu.br.ufpe.cin.sword.cm.sat.strategies;
+package edu.br.ufpe.cin.sword.cm.propositional.strategies;
 
 import edu.br.ufpe.cin.sword.cm.strategies.ConnectionStrategy;
 
-public class SATConnectionStrategy implements ConnectionStrategy<Integer, Void> {
+public class PropositionalConnectionStrategy implements ConnectionStrategy<Integer, Void> {
 
     @Override
     public boolean connect(Integer literal, Integer other) {

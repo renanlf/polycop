@@ -9,14 +9,14 @@ import java.io.IOException;
 import org.junit.Test;
 
 import edu.br.ufpe.cin.sword.cm.mapper.exceptions.FileParserException;
-import edu.br.ufpe.cin.sword.cm.sat.SATConnectionProver;
+import edu.br.ufpe.cin.sword.cm.propositional.PropositionalConnectionProver;
 
-public class SATConnectionProverTest {
+public class PropositionalConnectionProverTest {
 
     @Test
     public void testFile00001() throws IOException, FileParserException {
         File file = new File("src/test/resources/sat/test_00001.cnf");
-        SATConnectionProver prover = new SATConnectionProver();
+        PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
         assertFalse(prover.unsat(file));
     }
@@ -24,7 +24,7 @@ public class SATConnectionProverTest {
     @Test
     public void testFile00002() throws IOException, FileParserException {
         File file = new File("src/test/resources/sat/test_00002.cnf");
-        SATConnectionProver prover = new SATConnectionProver();
+        PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
         assertTrue(prover.unsat(file));
     }
@@ -32,7 +32,7 @@ public class SATConnectionProverTest {
     @Test
     public void testFile00003() throws IOException, FileParserException {
         File file = new File("src/test/resources/sat/test_00003.cnf");
-        SATConnectionProver prover = new SATConnectionProver();
+        PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
         assertTrue(prover.unsat(file));
     }
@@ -42,7 +42,7 @@ public class SATConnectionProverTest {
     @Test
     public void testFileDubois20() throws IOException, FileParserException {
         File file = new File("src/test/resources/sat/dubois20.cnf");
-        SATConnectionProver prover = new SATConnectionProver();
+        PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
         assertTrue(prover.unsat(file));
     }

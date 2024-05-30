@@ -1,15 +1,12 @@
-package edu.br.ufpe.cin.sword.cm.sat.strategies;
+package edu.br.ufpe.cin.sword.cm.propositional.strategies;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import edu.br.ufpe.cin.sword.cm.node.LinkedNode;
 import edu.br.ufpe.cin.sword.cm.strategies.CopyStrategy;
 
-public class SATCopyStrategy implements CopyStrategy<Integer, LinkedNode<Collection<Integer>>> {
+public class PropositionalCopyStrategy implements CopyStrategy<Integer, LinkedNode<Collection<Integer>>> {
 
     private LinkedNode<Collection<Integer>> clausesUsed;
 

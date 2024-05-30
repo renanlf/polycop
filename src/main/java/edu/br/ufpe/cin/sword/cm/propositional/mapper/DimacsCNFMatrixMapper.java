@@ -1,4 +1,4 @@
-package edu.br.ufpe.cin.sword.cm.sat.mapper;
+package edu.br.ufpe.cin.sword.cm.propositional.mapper;
 
 import java.io.BufferedReader;
 import java.io.File;
