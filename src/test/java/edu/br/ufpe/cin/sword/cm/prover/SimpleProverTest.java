@@ -1,6 +1,7 @@
 package edu.br.ufpe.cin.sword.cm.prover;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -14,6 +15,9 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.br.ufpe.cin.sword.cm.strategies.BlockingStrategy;
+import edu.br.ufpe.cin.sword.cm.strategies.ConnectionStrategy;
+import edu.br.ufpe.cin.sword.cm.strategies.CopyStrategy;
 import edu.br.ufpe.cin.sword.cm.tree.ProofTreeFactory;
 
 public class SimpleProverTest {
@@ -183,5 +187,123 @@ public class SimpleProverTest {
         verify(proofTreeFactory, times(1)).fail(List.of(5), Set.of(1));
 
     }
+
+    @Test
+    public void proveWithEmptyCopies_ExpectFail() throws IllegalAccessException {
+        // GIVEN
+        List<List<Integer>> matrix = List.of(
+                List.of(1));
+
+        FieldUtils.writeField(prover, "copyStrategy", new CopyStrategy<Integer, Void>() {
+            @Override
+            public Optional<List<Integer>> copy(List<Integer> clause) {
+                return Optional.empty();
+            }
+        }, true);
+
+        // WHEN
+        prover.prove(matrix);
+
+        // THEN
+        verify(proofTreeFactory, times(1)).fail(null, null);
+
+    }
+
+    @Test
+    public void proveWithNoCopiesAllowed_ExpectFail() throws IllegalAccessException {
+        // GIVEN
+        List<List<Integer>> matrix = List.of(
+                List.of(1),
+                List.of(-1));
+
+        FieldUtils.writeField(prover, "copyStrategy", new CopyStrategy<Integer, Void>() {
+            @Override
+            public Optional<List<Integer>> copy(List<Integer> clause) {
+                return clause.get(0) == -1
+                        ? Optional.empty()
+                        : Optional.of(clause);
+            }
+        }, true);
+
+        // WHEN
+        prover.prove(matrix);
+
+        // THEN
+        verify(proofTreeFactory, times(1)).fail(eq(List.of(1)), anySet());
+
+    }
+
+    @Test
+    public void proveWithBlockingStrategyReturingTrue_ExpectFail() throws IllegalAccessException {
+        // GIVEN
+        List<List<Integer>> matrix = List.of(
+                List.of(1),
+                List.of(-1));
+
+        FieldUtils.writeField(prover, "blockingStrategy", new BlockingStrategy<Integer, Void, Void>() {
+            @Override
+            public boolean isBlocked(Integer literal, Set<Integer> path, Void connState, Void copyState) {
+                return literal == -1;
+            }
+        }, true);
+
+        // WHEN
+        prover.prove(matrix);
+
+        // THEN
+        verify(proofTreeFactory, times(1)).fail(eq(List.of(1)), anySet());
+
+    }
+
+    @Test
+    public void proveWithComplementaryLiteralInThePathButConnectionNotAllowed_ExpectFail()
+            throws IllegalAccessException {
+        // GIVEN
+        List<List<Integer>> matrix = List.of(
+                List.of(1),
+                List.of(-1, 2),
+                List.of(-2, -1));
+        FieldUtils.writeField(prover, "connStrategy", new ConnectionStrategy<Integer, Void>() {
+            private int count = 0;
+            @Override
+            public boolean connect(Integer literal, Integer other) {
+                if (other == -1 && count < 1) {
+                    count++;
+                    return true;
+                }
+
+                return false;
+            }
+        }, true);
+
+        // WHEN
+        prover.prove(matrix);
+
+        // THEN
+        verify(proofTreeFactory, times(5)).fail(any(), any());
+
+    }
+
+    @Test
+    public void proveWithTwoComplementarySingletonClausesButConnectionNotAllowed_ExpectFail() throws IllegalAccessException {
+        // GIVEN
+        List<List<Integer>> matrix = List.of(
+                List.of(1),
+                List.of(-1));
+
+        FieldUtils.writeField(prover, "connStrategy", new ConnectionStrategy<Integer, Void>() {
+            @Override
+            public boolean connect(Integer literal, Integer other) {
+                return false;
+            }
+        }, true);
+
+        // WHEN
+        prover.prove(matrix);
+
+        // THEN
+        verify(proofTreeFactory, times(3)).fail(any(), any());
+    }
+
 
 }
