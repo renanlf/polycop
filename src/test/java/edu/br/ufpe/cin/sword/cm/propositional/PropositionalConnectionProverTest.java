@@ -9,7 +9,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 import edu.br.ufpe.cin.sword.cm.mapper.exceptions.FileParserException;
-import edu.br.ufpe.cin.sword.cm.propositional.PropositionalConnectionProver;
 
 public class PropositionalConnectionProverTest {
 
