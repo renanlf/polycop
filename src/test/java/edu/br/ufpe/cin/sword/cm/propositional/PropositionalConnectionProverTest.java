@@ -36,14 +36,12 @@ public class PropositionalConnectionProverTest {
         assertTrue(prover.unsat(file));
     }
 
-
-
     @Test
-    public void testFileDubois20() throws IOException, FileParserException {
-        File file = new File("src/test/resources/propositional/dubois20.cnf");
+    public void testFileQuinn() throws IOException, FileParserException {
+        File file = new File("src/test/resources/propositional/quinn.cnf");
         PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
-        assertTrue(prover.unsat(file));
+        assertFalse(prover.unsat(file));
     }
 
 }
