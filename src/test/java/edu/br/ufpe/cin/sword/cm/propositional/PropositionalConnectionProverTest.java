@@ -1,4 +1,4 @@
-package edu.br.ufpe.cin.sword.cm.sat.mapper;
+package edu.br.ufpe.cin.sword.cm.propositional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
