@@ -65,8 +65,11 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 		if (clause.isEmpty()) 
 			return proofFactory.ax(path);
 
-		// TODO: to implement a sort strategy to get next literal
-		Literal literal = clause.stream().findAny().get();
+		Literal literal = clause.get(0);
+
+		// Regularity
+		if (path.contains(literal))
+			return proofFactory.fail(clause, path);
 
 		ConnectionState connState = connStrategy.getState();
 		for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, path)) {
@@ -83,22 +86,24 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 		CopyState copyState = copyStrategy.getState();
 
-		for (List<Literal> matrixClause : litHelperStrategy.complementaryOfInMatrix(literal, matrix)) {
+		List<List<Literal>> clausesWithComplementaryLiteral = litHelperStrategy.complementaryOfInMatrix(literal, matrix);
+		for (List<Literal> matrixClause : clausesWithComplementaryLiteral) {
 			Optional<List<Literal>> copyClause = copyStrategy.copy(matrixClause);
 
 			if (copyClause.isPresent()) {
-				for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, copyClause.get())) {
+				List<Literal> negLiterals = litHelperStrategy.complementaryOf(literal, copyClause.get());
+				for (Literal negLiteral : negLiterals) {
 					if (connStrategy.connect(literal, negLiteral)) {
 						if (!blockingStrategy.isBlocked(negLiteral, path, connStrategy.getState(),
-								copyStrategy.getState())) {
+								copyStrategy.getState())) {							
 
-							ProofTree<Literal> subProofLeft = proveClause(minus(copyClause.get(), negLiteral), matrix,
+							ProofTree<Literal> subProofRight = proveClause(minus(clause, literal), matrix, path);
+
+							if (!(subProofRight instanceof FailProofTree)) {
+								ProofTree<Literal> subProofLeft = proveClause(minus(copyClause.get(), negLiteral), matrix,
 									add(path, literal));
 
-							if (!(subProofLeft instanceof FailProofTree)) {
-								ProofTree<Literal> subProofRight = proveClause(minus(clause, literal), matrix, path);
-
-								if (!(subProofRight instanceof FailProofTree)) {
+								if (!(subProofLeft instanceof FailProofTree)) {
 									return proofFactory.ext(clause, path, subProofLeft, subProofRight);
 								}
 							}

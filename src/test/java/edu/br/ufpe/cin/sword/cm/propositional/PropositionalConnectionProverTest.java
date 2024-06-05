@@ -1,4 +1,4 @@
-package edu.br.ufpe.cin.sword.cm.sat.mapper;
+package edu.br.ufpe.cin.sword.cm.propositional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,7 +9,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 import edu.br.ufpe.cin.sword.cm.mapper.exceptions.FileParserException;
-import edu.br.ufpe.cin.sword.cm.propositional.PropositionalConnectionProver;
 
 public class PropositionalConnectionProverTest {
 
@@ -37,14 +36,12 @@ public class PropositionalConnectionProverTest {
         assertTrue(prover.unsat(file));
     }
 
-
-
     @Test
-    public void testFileDubois20() throws IOException, FileParserException {
-        File file = new File("src/test/resources/propositional/dubois20.cnf");
+    public void testFileQuinn() throws IOException, FileParserException {
+        File file = new File("src/test/resources/propositional/quinn.cnf");
         PropositionalConnectionProver prover = new PropositionalConnectionProver();
 
-        assertTrue(prover.unsat(file));
+        assertFalse(prover.unsat(file));
     }
 
 }

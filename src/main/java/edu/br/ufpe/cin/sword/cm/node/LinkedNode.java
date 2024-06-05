@@ -33,6 +33,10 @@ public class LinkedNode<T> {
     public T getValue() {
         return value;
     }
+    
+    public Optional<LinkedNode<T>> getPrevious() {
+        return previous;
+    }
 
     @Override
     public int hashCode() {
