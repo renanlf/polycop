@@ -43,7 +43,6 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 		CopyState copyState = copyStrategy.getState();
 		for (List<Literal> clause : matrix) {
-			System.out.println("new clause start");
 			Optional<List<Literal>> copyClause = copyStrategy.copy(clause);
 
 			if (copyClause.isPresent() && !copyClause.get().isEmpty()) {
