@@ -27,6 +27,9 @@ Then, run the following command to compile and create the jar file:
  mvn clean package assembly:single
 ```
 If everything worked fine, a file called ```java-cop-$VERSION-jar-with-dependencies.jar``` was created in the `target/` folder.
+
+## Running Java-CoP for the propositional case
+
 Now, you can run the java-cop as the following example:
 ```bash
 java -jar target/java-cop-$VERSION-jar-with-dependencies.jar -prover propositional -file $FILEPATH
