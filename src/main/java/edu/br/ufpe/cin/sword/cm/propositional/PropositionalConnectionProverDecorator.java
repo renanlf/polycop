@@ -13,20 +13,21 @@ import edu.br.ufpe.cin.sword.cm.propositional.strategies.PropositionalCopyStrate
 import edu.br.ufpe.cin.sword.cm.propositional.strategies.PropositionalLiteralHelperStrategy;
 import edu.br.ufpe.cin.sword.cm.prover.SimpleProver;
 import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
+import edu.br.ufpe.cin.sword.cm.tree.ProofTree;
 
-public class PropositionalConnectionProver {
+public class PropositionalConnectionProverDecorator {
     private PropositionalLiteralHelperStrategy helperStrategy;
 
     private SimpleProver<Integer, Void, LinkedNode<List<Integer>>> prover;
 
-    public PropositionalConnectionProver() {
+    public PropositionalConnectionProverDecorator() {
         this.helperStrategy = new PropositionalLiteralHelperStrategy();
 
         this.prover = new SimpleProver<>(this.helperStrategy, new PropositionalConnectionStrategy(), new PropositionalCopyStrategy(),
                 new PropositionalBlockingStrategy());
     }
 
-    public boolean unsat(File inputFile) throws IOException, FileParserException {
+    public ProofTree<Integer> prove(File inputFile) throws IOException, FileParserException {
         helperStrategy.clear();
 
         var mapper = new DimacsCNFMatrixMapper();
@@ -35,7 +36,11 @@ public class PropositionalConnectionProver {
 
         var matrix = mapper.map(inputFile);
 
-        return !(prover.prove(matrix) instanceof FailProofTree<Integer>);
+        return prover.prove(matrix);
+    }
+
+    public boolean unsat(File inputFile) throws IOException, FileParserException {
+        return prove(inputFile) instanceof FailProofTree<Integer>;
     }
 
 }
