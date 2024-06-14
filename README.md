@@ -5,8 +5,8 @@ Welcome! This repo contains the Java-CoP: a connection method prover framework t
 ## Motivation
 
 Implementing an Automated Theorem Prover (ATP) for classical or new logic is a hard task, especially for researchers who want to test or present their theoretical results in a simple approach.
-One solution for developing provers is the Connection Method (CM), a goal-oriented direct proof search algorithm that looks for connections that unify a formula, allowing CM to perform competitively against the most prominent methods in ATP's field without low-level optimizations.
-Another advantage of CM is its uniformity, allowing it to apply to a range of logical languages with the same proof technique.
+One solution for developing provers is the Connection Method (CM). This goal-oriented direct proof search algorithm looks for connections that unify a formula. This allows CM to perform competitively against the most prominent methods in ATP's field without low-level optimizations.
+Another advantage of CM is its uniformity, which allows it to be applied to a range of logical languages with the same proof technique.
 Besides that, CM's uniformity provides a simple sharing of high-level optimization implementations between CMs.
 
 ## Installation
@@ -38,4 +38,36 @@ Where `$FILEPATH` is a path to a CNF-valid file.
 
 ## Generating proof in sequent-style to a .tex file
 
-Another key feature of Java-CoP command line runner is to generate a LaTeX (.tex) file with the proof in sequent-style using the ```-latex $LATEX_FILEPATH``` argument.
+Another key feature of the Java-CoP command-line runner is the ability to generate a LaTeX (.tex) file with the proof in sequent style using the ```-latex $LATEX_FILEPATH``` argument. The file will have its content like the following:
+```latex
+\documentclass[convert={outext=.eps, command=\unexpanded{pdftops -eps \infile}}]{standalone}
+\usepackage{bussproofs} % for sequent-style proofs
+\begin{document}
+\AxiomC{}
+\RightLabel{Ax}
+\UnaryInfC{$\{\}, M, [1]$}
+\AxiomC{}
+\RightLabel{Ax}
+\UnaryInfC{$\{\}, M, [-2, -3]$}
+\AxiomC{}
+\RightLabel{Ax}
+\UnaryInfC{$\{\}, M, [-2]$}
+\RightLabel{\textit{Ext}}
+\BinaryInfC{$[-3], M, [-2]$}
+
+\AxiomC{}
+\RightLabel{Ax}
+\UnaryInfC{$\{\}, M, []$}
+\RightLabel{\textit{Ext}}
+\BinaryInfC{$[-2], M, []$}
+
+\RightLabel{\textit{Ext}}
+\BinaryInfC{$[1, -2], M, []$}
+
+\RightLabel{\textit{St}}
+\UnaryInfC{$\varepsilon, M, \varepsilon$}
+
+\DisplayProof
+
+\end{document}
+```
