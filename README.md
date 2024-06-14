@@ -35,3 +35,7 @@ Now, you can run the java-cop as the following example:
 java -jar target/java-cop-$VERSION-jar-with-dependencies.jar -prover propositional -file $FILEPATH
 ```
 Where `$FILEPATH` is a path to a CNF-valid file.
+
+## Generating proof in sequent-style to a .tex file
+
+Another key feature of Java-CoP command line runner is to generate a LaTeX (.tex) file with the proof in sequent-style using the ```-latex $LATEX_FILEPATH``` argument.
