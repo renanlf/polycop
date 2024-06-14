@@ -15,7 +15,7 @@ public class PropositionalConnectionProverTest {
     @Test
     public void testFile00001() throws IOException, FileParserException {
         File file = new File("src/test/resources/propositional/test_00001.cnf");
-        PropositionalConnectionProver prover = new PropositionalConnectionProver();
+        PropositionalConnectionProverDecorator prover = new PropositionalConnectionProverDecorator();
 
         assertFalse(prover.unsat(file));
     }
@@ -23,7 +23,7 @@ public class PropositionalConnectionProverTest {
     @Test
     public void testFile00002() throws IOException, FileParserException {
         File file = new File("src/test/resources/propositional/test_00002.cnf");
-        PropositionalConnectionProver prover = new PropositionalConnectionProver();
+        PropositionalConnectionProverDecorator prover = new PropositionalConnectionProverDecorator();
 
         assertTrue(prover.unsat(file));
     }
@@ -31,7 +31,7 @@ public class PropositionalConnectionProverTest {
     @Test
     public void testFile00003() throws IOException, FileParserException {
         File file = new File("src/test/resources/propositional/test_00003.cnf");
-        PropositionalConnectionProver prover = new PropositionalConnectionProver();
+        PropositionalConnectionProverDecorator prover = new PropositionalConnectionProverDecorator();
 
         assertTrue(prover.unsat(file));
     }
@@ -39,7 +39,7 @@ public class PropositionalConnectionProverTest {
     @Test
     public void testFileQuinn() throws IOException, FileParserException {
         File file = new File("src/test/resources/propositional/quinn.cnf");
-        PropositionalConnectionProver prover = new PropositionalConnectionProver();
+        PropositionalConnectionProverDecorator prover = new PropositionalConnectionProverDecorator();
 
         assertFalse(prover.unsat(file));
     }
