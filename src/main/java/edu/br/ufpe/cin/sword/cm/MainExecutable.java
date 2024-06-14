@@ -67,9 +67,9 @@ public class MainExecutable {
         var proofTree = prover.prove(new File(file));
 
         if (proofTree instanceof FailProofTree<Integer>) {
-            System.out.println(file + " is unsatisfiable");
-        } else {
             System.out.println(file + " is satisfiable");
+        } else {
+            System.out.println(file + " is unsatisfiable");
         }
 
         if (latexFilepath != null) {
