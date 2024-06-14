@@ -11,12 +11,12 @@ public class FailProofTree<Literal> extends ProofTree<Literal> {
 
 	@Override
 	public String toString() {
-		return "fail()";
+		return "fail(" + getClause() + ", " + getPath() + ")";
 	}
 	
 	@Override
 	public String latexString() {
-		return "FAILED!";
+		return "\\AxiomC{" + getClause() + ", " + getPath() + "}\r\n";
 	}
 
 }
