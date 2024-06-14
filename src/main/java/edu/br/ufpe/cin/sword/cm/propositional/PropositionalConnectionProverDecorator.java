@@ -40,7 +40,7 @@ public class PropositionalConnectionProverDecorator {
     }
 
     public boolean unsat(File inputFile) throws IOException, FileParserException {
-        return prove(inputFile) instanceof FailProofTree<Integer>;
+        return !(prove(inputFile) instanceof FailProofTree<Integer>);
     }
 
 }
