@@ -44,4 +44,12 @@ public class PropositionalConnectionProverTest {
         assertFalse(prover.unsat(file));
     }
 
+    @Test
+    public void testFilePaperExample() throws IOException, FileParserException {
+        File file = new File("src/test/resources/propositional/paper_example.cnf");
+        PropositionalConnectionProverDecorator prover = new PropositionalConnectionProverDecorator();
+
+        assertTrue(prover.unsat(file));
+    }
+
 }
