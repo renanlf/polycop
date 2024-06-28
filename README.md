@@ -71,3 +71,5 @@ Another key feature of the Java-CoP command-line runner is the ability to genera
 
 \end{document}
 ```
+The output of the above document in Overleaf is the following:
+![image](https://github.com/renanlf/java-cop/assets/8339052/303ad47d-e01c-4056-98a3-fb57af1d5627)
