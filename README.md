@@ -24,7 +24,7 @@ cd java-cop
 ```
 Then, run the following command to compile and create the jar file:
 ```bash
- mvn clean package assembly:single
+ mvn clean package -DskipTests assembly:single
 ```
 If everything worked fine, a file called ```java-cop-$VERSION-jar-with-dependencies.jar``` was created in the `target/` folder.
 
