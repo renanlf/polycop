@@ -119,28 +119,24 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 	}
 
 	private ALCHbLiteral copyLiteral(ALCHbLiteral literal, Map<ALCHbTerm, ALCHbTerm> termsMap) {
-		if(literal instanceof ALCHbConceptLiteral) {
-			ALCHbConceptLiteral conLit = (ALCHbConceptLiteral) literal;
-			return factory.conLiteral(conLit.getName(), conLit.isPositive(), termsMap.get(conLit.getTerm()));
+		if(literal instanceof ALCHbConceptLiteral conLit) {
+            return factory.conLiteral(conLit.getName(), conLit.isPositive(), termsMap.get(conLit.getTerm()));
 		}
 		
-		if(literal instanceof ALCHbRoleLiteral) {
-			ALCHbRoleLiteral roleLit = (ALCHbRoleLiteral) literal;
-			return factory.roleLiteral(roleLit.getName(), roleLit.isPositive(), 
+		if(literal instanceof ALCHbRoleLiteral roleLit) {
+            return factory.roleLiteral(roleLit.getName(), roleLit.isPositive(),
 					termsMap.get(roleLit.getFirst()),
 					termsMap.get(roleLit.getSecond()));
 		}
 		
-		if(literal instanceof ALCHbOrderedLiteral) {
-			ALCHbOrderedLiteral ordLit = (ALCHbOrderedLiteral) literal;
-			return factory.ordLiteral(ordLit.isPositive(), 
+		if(literal instanceof ALCHbOrderedLiteral ordLit) {
+            return factory.ordLiteral(ordLit.isPositive(),
 					termsMap.get(ordLit.getFirst()),
 					termsMap.get(ordLit.getSecond()));
 		}
 		
-		if(literal instanceof ALCHbBiOrderedLiteral) {
-			ALCHbBiOrderedLiteral biOrdLit = (ALCHbBiOrderedLiteral) literal;
-			return factory.biOrdLiteral(biOrdLit.isPositive(), 
+		if(literal instanceof ALCHbBiOrderedLiteral biOrdLit) {
+            return factory.biOrdLiteral(biOrdLit.isPositive(),
 					termsMap.get(biOrdLit.getFirst()),
 					termsMap.get(biOrdLit.getSecond()), 
 					termsMap.get(biOrdLit.getThird()),
@@ -162,7 +158,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 
 	@Override
 	public void setState(Map<ALCHbTerm, List<ALCHbTerm>> state) {
-		copies = Collections.unmodifiableMap(new HashMap<>(state));
+		copies = Map.copyOf(state);
 	}
 
 }

@@ -34,7 +34,7 @@ public class ALCHbProverTest {
 	public void simpleTests() {
 		ALCHbIndividual a = factory.ind("a");
 		
-		ProofTree<ALCHbLiteral> proof = null;
+		ProofTree<ALCHbLiteral> proof;
 		
 		proof = prover.prove(factory.matrixOf(
 			factory.clauseOf(factory.conLiteral("A", false, a)),
@@ -361,7 +361,7 @@ public class ALCHbProverTest {
 		
 		assertTrue(proof instanceof StartProofTree<?>);
 		Collections.reverse(matrix);
-		System.out.println(LaTeXMatrixVisitor.<ALCHbLiteral>getLatexMatrixOf(matrix));
+		System.out.println(LaTeXMatrixVisitor.getLatexMatrixOf(matrix));
 		System.out.println(proof.latexString());
 	}
 
