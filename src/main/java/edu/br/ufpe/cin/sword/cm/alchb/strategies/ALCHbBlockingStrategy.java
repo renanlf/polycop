@@ -22,12 +22,6 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 	public boolean isBlocked(ALCHbLiteral literal, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs,
 			Map<ALCHbTerm, List<ALCHbTerm>> copies) {
 		
-//		if(literal.terms()
-//			.map(t -> t.getCopyOf() == null ? t : t.getCopyOf())
-//			.map(t -> copies.get(t).size())
-//			.max(Comparator.naturalOrder()).orElse(0) > 120)
-//			return true;
-		
 		if(literal instanceof ALCHbConceptLiteral) 
 			return isBlocked((ALCHbConceptLiteral) literal, path, subs, copies);
 		
@@ -193,7 +187,7 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 	private Set<String> conceptsSet(ALCHbTerm term, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
 		final ALCHbTerm subsTerm = getSubstitution(term, subs);
 		return path.stream().filter(l -> l instanceof ALCHbConceptLiteral).map(l -> (ALCHbConceptLiteral) l)
-				.filter(l -> getSubstitution(l.getTerm(), subs) == subsTerm).map(l -> l.getName())
+				.filter(l -> getSubstitution(l.getTerm(), subs) == subsTerm).map(ALCHbConceptLiteral::getName)
 				.collect(Collectors.toSet());
 	}
 	
@@ -204,7 +198,7 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		return path.stream().filter(l -> l instanceof ALCHbRoleLiteral).map(l -> (ALCHbRoleLiteral) l)
 				.filter(l -> getSubstitution(l.getFirst(), subs) == subsFirst
 						&& getSubstitution(l.getSecond(), subs) == subsSecond)
-				.map(l -> l.getName())
+				.map(ALCHbRoleLiteral::getName)
 				.collect(Collectors.toSet());
 	}
 	
