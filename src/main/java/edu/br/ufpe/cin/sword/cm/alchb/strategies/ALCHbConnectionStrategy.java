@@ -1,11 +1,6 @@
 package edu.br.ufpe.cin.sword.cm.alchb.strategies;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbBiOrderedLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbConceptLiteral;
@@ -15,17 +10,14 @@ import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbRoleLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbTerm;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbUnaryIndividual;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbVariable;
+import edu.br.ufpe.cin.sword.cm.node.LinkedNode;
 import edu.br.ufpe.cin.sword.cm.strategies.ConnectionStrategy;
 
-public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral, Map<ALCHbVariable, ALCHbTerm>> {
+public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral, LinkedNode<Map<ALCHbVariable, ALCHbTerm>>> {
 
-	private Map<ALCHbVariable, ALCHbTerm> subs;
+	private LinkedNode<Map<ALCHbVariable, ALCHbTerm>> state;
 	
 	private static final ALCHbVariable NULL_VAR = new ALCHbVariable("null");
-
-	public ALCHbConnectionStrategy() {
-		this.subs = Collections.emptyMap();
-	}
 
 	@Override
 	public boolean connect(ALCHbLiteral literal, ALCHbLiteral other) {
@@ -172,35 +164,50 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 	 * this approach ensures immutable map state when backtracking occurs.
 	 * @param entries a set of entries to be added.
 	 */
-	private void putEntries(Set<Map.Entry<ALCHbVariable, ALCHbTerm>> entries) {	
-		if(!entries.isEmpty()) {
-			subs = new HashMap<>(subs);
-			entries.forEach(e -> subs.put(e.getKey(), e.getValue()));
-			subs = Collections.unmodifiableMap(subs);
-		}
+	private void putEntries(Set<Map.Entry<ALCHbVariable, ALCHbTerm>> entries) {
+		Map<ALCHbVariable, ALCHbTerm> map = new HashMap<>();
+		entries.forEach(entry -> map.put(entry.getKey(), entry.getValue()));
+
+		this.state = Optional.ofNullable(this.state)
+				.map(state -> state.push(map))
+				.orElse(new LinkedNode<>(map));
 	}
 	
 	private ALCHbTerm getSubstitution(ALCHbTerm term) {
-		while (subs.containsKey(term)) {
-			term = subs.get(term);
+		ALCHbTerm mappedTerm;
+		while ((mappedTerm = getTermFromLinkedNodes(term)) != null) {
+			term = mappedTerm;
 		}
 
 		return term;
 	}
 
+	private ALCHbTerm getTermFromLinkedNodes(ALCHbTerm term) {
+		Optional<LinkedNode<Map<ALCHbVariable, ALCHbTerm>>> cursor = Optional.ofNullable(this.state);
+
+		while (cursor.isPresent()) {
+			if (cursor.get().getValue().containsKey(term)) {
+				return cursor.get().getValue().get(term);
+			}
+			cursor = cursor.get().getPrevious();
+		}
+
+		return null;
+	}
+
 	@Override
 	public void clear() {
-		subs = Collections.emptyMap();
+		this.state = null;
 	}
 
 	@Override
-	public Map<ALCHbVariable, ALCHbTerm> getState() {
-		return subs;
+	public LinkedNode<Map<ALCHbVariable, ALCHbTerm>> getState() {
+		return this.state;
 	}
 
 	@Override
-	public void setState(Map<ALCHbVariable, ALCHbTerm> state) {
-		subs = state;
+	public void setState(LinkedNode<Map<ALCHbVariable, ALCHbTerm>> state) {
+		this.state = state;
 	}
 
 }

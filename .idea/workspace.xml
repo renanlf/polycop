@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="38420cd9-8deb-4761-b249-8bcf825c6e0d" name="Changes" comment="refactoring code and creating Intellij files" />
+    <list default="true" id="38420cd9-8deb-4761-b249-8bcf825c6e0d" name="Changes" comment="refactoring code and creating Intellij files">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/edu/br/ufpe/cin/sword/cm/alchb/ALCHbSimpleProver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/edu/br/ufpe/cin/sword/cm/alchb/ALCHbSimpleProver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/edu/br/ufpe/cin/sword/cm/alchb/strategies/ALCHbBlockingStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/edu/br/ufpe/cin/sword/cm/alchb/strategies/ALCHbBlockingStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/edu/br/ufpe/cin/sword/cm/alchb/strategies/ALCHbConnectionStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/edu/br/ufpe/cin/sword/cm/alchb/strategies/ALCHbConnectionStrategy.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,17 +18,18 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="alchb" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2jZAOV99ZShZ8IHB7VJT9oU9QHj" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -33,7 +39,7 @@
   "keyToString": {
     "JUnit.ALCHbProverTest.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "alchb",
+    "git-widget-placeholder": "feature-alchb-linked-nodes",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/leand/Documents/code/java-cop",
@@ -84,6 +90,7 @@
       <option name="presentableId" value="Default" />
       <updated>1721584193250</updated>
       <workItem from="1721584194677" duration="510000" />
+      <workItem from="1722388104989" duration="2370000" />
     </task>
     <task id="LOCAL-00001" summary="refactoring code and creating Intellij files">
       <option name="closed" value="true" />

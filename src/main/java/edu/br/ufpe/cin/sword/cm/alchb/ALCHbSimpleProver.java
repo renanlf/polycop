@@ -11,9 +11,10 @@ import edu.br.ufpe.cin.sword.cm.alchb.strategies.ALCHbBlockingStrategy;
 import edu.br.ufpe.cin.sword.cm.alchb.strategies.ALCHbConnectionStrategy;
 import edu.br.ufpe.cin.sword.cm.alchb.strategies.ALCHbCopyStrategy;
 import edu.br.ufpe.cin.sword.cm.alchb.strategies.ALCHbHelperStrategy;
+import edu.br.ufpe.cin.sword.cm.node.LinkedNode;
 import edu.br.ufpe.cin.sword.cm.prover.SimpleProver;
 
-public class ALCHbSimpleProver extends SimpleProver<ALCHbLiteral, Map<ALCHbVariable, ALCHbTerm>, Map<ALCHbTerm, List<ALCHbTerm>>> {
+public class ALCHbSimpleProver extends SimpleProver<ALCHbLiteral, LinkedNode<Map<ALCHbVariable, ALCHbTerm>>, Map<ALCHbTerm, List<ALCHbTerm>>> {
 
 	public ALCHbSimpleProver() {		
 		super(new ALCHbHelperStrategy(), new ALCHbConnectionStrategy(), new ALCHbCopyStrategy(new ALCHbFactory()), new ALCHbBlockingStrategy());
