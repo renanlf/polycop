@@ -1,10 +1,6 @@
 package edu.br.ufpe.cin.sword.cm.alchb.strategies;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbBiOrderedLiteral;
@@ -14,12 +10,13 @@ import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbOrderedLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbRoleLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbTerm;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbVariable;
+import edu.br.ufpe.cin.sword.cm.node.LinkedNode;
 import edu.br.ufpe.cin.sword.cm.strategies.BlockingStrategy;
 
-public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map<ALCHbVariable, ALCHbTerm>, Map<ALCHbTerm, List<ALCHbTerm>>> {
+public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, LinkedNode<Map<ALCHbVariable, ALCHbTerm>>, Map<ALCHbTerm, List<ALCHbTerm>>> {
 
 	@Override
-	public boolean isBlocked(ALCHbLiteral literal, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs,
+	public boolean isBlocked(ALCHbLiteral literal, Set<ALCHbLiteral> path, LinkedNode<Map<ALCHbVariable, ALCHbTerm>> subs,
 			Map<ALCHbTerm, List<ALCHbTerm>> copies) {
 		
 		if(literal instanceof ALCHbConceptLiteral) 
@@ -38,7 +35,7 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		
 	}
 	
-	private boolean isBlocked(ALCHbConceptLiteral literal, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs,
+	private boolean isBlocked(ALCHbConceptLiteral literal, Set<ALCHbLiteral> path, LinkedNode<Map<ALCHbVariable, ALCHbTerm>> subs,
 			Map<ALCHbTerm, List<ALCHbTerm>> copies) {
 		ALCHbTerm term = literal.getTerm();
 
@@ -73,7 +70,7 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		return false;
 	}
 	
-	private boolean isBlocked(ALCHbRoleLiteral literal, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs,
+	private boolean isBlocked(ALCHbRoleLiteral literal, Set<ALCHbLiteral> path, LinkedNode<Map<ALCHbVariable, ALCHbTerm>> subs,
 			Map<ALCHbTerm, List<ALCHbTerm>> copies) {
 		ALCHbTerm first = literal.getFirst();
 		ALCHbTerm second = literal.getSecond();
@@ -114,7 +111,7 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		return false;
 	}
 	
-	private boolean isBlocked(ALCHbOrderedLiteral literal, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
+	private boolean isBlocked(ALCHbOrderedLiteral literal, Set<ALCHbLiteral> path, LinkedNode<Map<ALCHbVariable, ALCHbTerm>> subs) {
 		Set<Map.Entry<ALCHbTerm, ALCHbTerm>> edges = path.stream()
 				.filter(l -> l instanceof ALCHbOrderedLiteral)
 				.map(l -> Map.entry(((ALCHbOrderedLiteral) l).getFirst(), 
@@ -147,7 +144,7 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		
 	}
 	
-	private boolean isBlocked(ALCHbBiOrderedLiteral literal, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
+	private boolean isBlocked(ALCHbBiOrderedLiteral literal, Set<ALCHbLiteral> path, LinkedNode<Map<ALCHbVariable, ALCHbTerm>> subs) {
 		Set<Map.Entry<Map.Entry<ALCHbTerm, ALCHbTerm>, Map.Entry<ALCHbTerm, ALCHbTerm>>> edges = path.stream()
 				.filter(l -> l instanceof ALCHbBiOrderedLiteral)
 				.map(l -> Map.entry(
@@ -184,14 +181,14 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		
 	}
 
-	private Set<String> conceptsSet(ALCHbTerm term, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
+	private Set<String> conceptsSet(ALCHbTerm term, Set<ALCHbLiteral> path, LinkedNode<Map<ALCHbVariable, ALCHbTerm>> subs) {
 		final ALCHbTerm subsTerm = getSubstitution(term, subs);
 		return path.stream().filter(l -> l instanceof ALCHbConceptLiteral).map(l -> (ALCHbConceptLiteral) l)
 				.filter(l -> getSubstitution(l.getTerm(), subs) == subsTerm).map(ALCHbConceptLiteral::getName)
 				.collect(Collectors.toSet());
 	}
 	
-	private Set<String> rolesSet(ALCHbTerm first, ALCHbTerm second, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
+	private Set<String> rolesSet(ALCHbTerm first, ALCHbTerm second, Set<ALCHbLiteral> path, LinkedNode<Map<ALCHbVariable, ALCHbTerm>> subs) {
 		final ALCHbTerm subsFirst = getSubstitution(first, subs);
 		final ALCHbTerm subsSecond = getSubstitution(second, subs);
 		
@@ -201,13 +198,27 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 				.map(ALCHbRoleLiteral::getName)
 				.collect(Collectors.toSet());
 	}
-	
-	private ALCHbTerm getSubstitution(ALCHbTerm term, Map<ALCHbVariable, ALCHbTerm> subs) {
-		while (subs.containsKey(term)) {
-			term = subs.get(term);
+
+	private ALCHbTerm getSubstitution(ALCHbTerm term, LinkedNode<Map<ALCHbVariable, ALCHbTerm>> subs) {
+		ALCHbTerm mappedTerm;
+		while ((mappedTerm = getTermFromLinkedNodes(term, subs)) != null) {
+			term = mappedTerm;
 		}
 
 		return term;
+	}
+
+	private ALCHbTerm getTermFromLinkedNodes(ALCHbTerm term, LinkedNode<Map<ALCHbVariable, ALCHbTerm>> subs) {
+		Optional<LinkedNode<Map<ALCHbVariable, ALCHbTerm>>> cursor = Optional.ofNullable(subs);
+
+		while (cursor.isPresent()) {
+			if (cursor.get().getValue().containsKey(term)) {
+				return cursor.get().getValue().get(term);
+			}
+			cursor = cursor.get().getPrevious();
+		}
+
+		return null;
 	}
 
 }
