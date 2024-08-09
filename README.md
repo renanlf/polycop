@@ -1,6 +1,6 @@
-# Java-CoP
+# PolyCoP
 
-Welcome! This repo contains the Java-CoP: a connection method prover framework to abstract the proof-related algorithm for the user. It helps to focus only on literal representation, unification, and blocking strategies.
+Welcome! This repo contains PolyCoP, a connection method prover framework that abstracts the proof-related algorithm for the user. It helps the developer focus only on literal representation, unification, and blocking strategies.
 
 ## Motivation
 
@@ -19,26 +19,26 @@ Besides that, CM's uniformity provides a simple sharing of high-level optimizati
 
 Using your best command-line terminal, clone this repo and enter the root folder:
 ```bash
-git clone git@github.com:renanlf/java-cop.git
-cd java-cop
+git clone git@github.com:renanlf/polycop.git
+cd polycop
 ```
 Then, run the following command to compile and create the jar file:
 ```bash
  mvn clean package -DskipTests assembly:single
 ```
-If everything worked fine, a file called ```java-cop-$VERSION-jar-with-dependencies.jar``` was created in the `target/` folder.
+If everything worked fine, a file called ```polycop-$VERSION-jar-with-dependencies.jar``` was created in the `target/` folder.
 
-## Running Java-CoP for the propositional case
+## Running PolyCoP for the propositional case
 
-Now, you can run the java-cop as the following example:
+Now, you can run the PolyCoP as the following example:
 ```bash
-java -jar target/java-cop-$VERSION-jar-with-dependencies.jar -prover propositional -file $FILEPATH
+java -jar target/polycop-$VERSION-jar-with-dependencies.jar -prover propositional -file $FILEPATH
 ```
 Where `$FILEPATH` is a path to a CNF-valid file.
 
 ## Generating proof in sequent-style to a .tex file
 
-Another key feature of the Java-CoP command-line runner is the ability to generate a LaTeX (.tex) file with the proof in sequent style using the ```-latex $LATEX_FILEPATH``` argument. The file will have its content like the following:
+Another key feature of the PolyCoP command-line runner is the ability to generate a LaTeX (.tex) file with the proof in sequent style using the ```-latex $LATEX_FILEPATH``` argument. The file will have its content like the following:
 ```latex
 \documentclass[convert={outext=.eps, command=\unexpanded{pdftops -eps \infile}}]{standalone}
 \usepackage{bussproofs} % for sequent-style proofs
@@ -72,4 +72,4 @@ Another key feature of the Java-CoP command-line runner is the ability to genera
 \end{document}
 ```
 The output of the above document in Overleaf is the following:
-![image](https://github.com/renanlf/java-cop/assets/8339052/303ad47d-e01c-4056-98a3-fb57af1d5627)
+![image](https://github.com/renanlf/polycop/assets/8339052/303ad47d-e01c-4056-98a3-fb57af1d5627)
