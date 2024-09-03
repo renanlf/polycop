@@ -19,8 +19,8 @@ import edu.br.ufpe.cin.sword.cm.mapper.listeners.MatrixListener;
 
 public class DimacsCNFMatrixMapper implements MatrixMapper<Integer> {
 
-    private Set<ClauseListener<Integer>> clauseListeners;
-    private Set<MatrixListener<Integer>> matrixListeners;
+    private final Set<ClauseListener<Integer>> clauseListeners;
+    private final Set<MatrixListener<Integer>> matrixListeners;
 
     public DimacsCNFMatrixMapper() {
         this.clauseListeners = new HashSet<>();
@@ -29,20 +29,16 @@ public class DimacsCNFMatrixMapper implements MatrixMapper<Integer> {
 
     @Override
     public List<List<Integer>> map(File file) throws IOException, FileParserException {
-        Pattern pLinePattern = Pattern.compile("p[\s\t\n]*cnf[\s\t\n]*(\\d+)[\s\t\n]*(\\d+)");
+        Pattern pLinePattern = Pattern.compile("p[ \t\n]*cnf[ \t\n]*(\\d+)[ \t\n]*(\\d+)");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
-            int numberLiterals;
-            int numberClauses;
             boolean readingClauses = false;
             List<List<Integer>> matrix = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
                 if (!readingClauses) {
                     Matcher matcher = pLinePattern.matcher(line);
                     if (matcher.matches()) {
-                        numberLiterals = Integer.valueOf(matcher.group(1));
-                        numberClauses = Integer.valueOf(matcher.group(2));
                         readingClauses = true;
                     }
                 } else {
@@ -50,6 +46,7 @@ public class DimacsCNFMatrixMapper implements MatrixMapper<Integer> {
                     try (Scanner scanner = new Scanner(line)) {
                         while (scanner.hasNextInt()) {
                             int number = scanner.nextInt();
+                            number *= -1; // converting to DNF
 
                             if (number == 0) {
                                 break;
@@ -66,6 +63,7 @@ public class DimacsCNFMatrixMapper implements MatrixMapper<Integer> {
             notifyMatrixListeners(matrix);
             return matrix;
         } catch (Exception e) {
+            System.err.println(e.getMessage());
             throw new FileParserException();
         }
     }
@@ -81,15 +79,11 @@ public class DimacsCNFMatrixMapper implements MatrixMapper<Integer> {
     }
 
     private void notifyClauseListeners(List<Integer> clause) {
-        clauseListeners.forEach(clauseListener -> {
-            clauseListener.onClauseMap(clause);
-        });
+        clauseListeners.forEach(clauseListener -> clauseListener.onClauseMap(clause));
     }
 
     private void notifyMatrixListeners(List<List<Integer>> matrix) {
-        matrixListeners.forEach(matrixListener -> {
-            matrixListener.onMatrixMap(matrix);
-        });
+        matrixListeners.forEach(matrixListener -> matrixListener.onMatrixMap(matrix));
     }
 
 }
