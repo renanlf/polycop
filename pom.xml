@@ -6,13 +6,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>edu.br.ufpe.cin.sword</groupId>
-  <artifactId>java-cop</artifactId>
+  <artifactId>polycop</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>java-cop</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <name>PolyCoP</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,6 +36,12 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.14.0</version>
       <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-distribution -->
+    <dependency>
+      <groupId>net.sourceforge.owlapi</groupId>
+      <artifactId>owlapi-distribution</artifactId>
+      <version>5.5.0</version>
     </dependency>
   </dependencies>
 
