@@ -19,6 +19,10 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
             this.visit((OWLEquivalentClassesAxiom) axiom);
         } else if (axiom.isOfType(AxiomType.CLASS_ASSERTION)) {
             this.visit((OWLClassAssertionAxiom) axiom);
+        } else if (axiom.isOfType(AxiomType.OBJECT_PROPERTY_ASSERTION)) {
+            this.visit((OWLObjectPropertyAssertionAxiom) axiom);
+        } else if (axiom.isOfType(AxiomType.SUB_OBJECT_PROPERTY)) {
+            this.visit((OWLSubObjectPropertyOfAxiom) axiom);
         }
 
         return visitResult;
@@ -26,11 +30,28 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
 
     @Override
     public void visit(OWLClassAssertionAxiom axiom) {
-        OWLClass newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
-        this.visitResult = new ALCHbOWLAxiomVisit(
-                List.of(owlDataFactory.getOWLClassAssertionAxiom(newClass, axiom.getIndividual())),
-                List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, axiom.getClassExpression()))
-        );
+        if (axiom.getClassExpression().isClassExpressionLiteral()) {
+            this.visitResult = new ALCHbOWLAxiomVisit(List.of(axiom), List.of());
+        } else {
+            OWLClass newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
+            this.visitResult = new ALCHbOWLAxiomVisit(
+                    List.of(owlDataFactory.getOWLClassAssertionAxiom(newClass, axiom.getIndividual())),
+                    List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, axiom.getClassExpression()))
+            );
+        }
+    }
+
+    @Override
+    public void visit(OWLObjectPropertyAssertionAxiom axiom) {
+        if (axiom.getProperty().isNamed()) {
+            this.visitResult = new ALCHbOWLAxiomVisit(List.of(axiom), List.of());
+        } else {
+            OWLObjectProperty newProperty = owlDataFactory.getOWLObjectProperty(UUID.randomUUID().toString());
+            this.visitResult = new ALCHbOWLAxiomVisit(
+                    List.of(owlDataFactory.getOWLObjectPropertyAssertionAxiom(newProperty, axiom.getSubject(), axiom.getObject())),
+                    List.of(owlDataFactory.getOWLSubObjectPropertyOfAxiom(newProperty, axiom.getProperty()))
+            );
+        }
     }
 
     @Override
@@ -40,17 +61,21 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
 
     @Override
     public void visit(OWLSubClassOfAxiom axiom) {
+        // TODO
         OWLAxiomVisitor.super.visit(axiom);
     }
 
     @Override
     public void visit(OWLSubObjectPropertyOfAxiom axiom) {
-
-    }
-
-    @Override
-    public void visit(OWLObjectPropertyAssertionAxiom axiom) {
-        OWLAxiomVisitor.super.visit(axiom);
+        if (!axiom.getSubProperty().isNamed() && !axiom.getSuperProperty().isNamed()) {
+            OWLObjectProperty newProperty = owlDataFactory.getOWLObjectProperty(UUID.randomUUID().toString());
+            this.visitResult = new ALCHbOWLAxiomVisit(List.of(
+                    owlDataFactory.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(), newProperty),
+                    owlDataFactory.getOWLSubObjectPropertyOfAxiom(newProperty, axiom.getSuperProperty())
+            ), List.of());
+        } else {
+            this.visitResult = new ALCHbOWLAxiomVisit(List.of(axiom), List.of());
+        }
     }
 
     public ALCHbOWLAxiomVisit getVisitResult() {
