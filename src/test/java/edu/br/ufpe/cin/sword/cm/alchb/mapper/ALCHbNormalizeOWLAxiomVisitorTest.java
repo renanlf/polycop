@@ -222,6 +222,22 @@ public class ALCHbNormalizeOWLAxiomVisitorTest {
     }
 
     @Test
+    public void testOWLSubClassOfAxiomVisitorWithNonLiteralInAllValuesFiller_Rule3() {
+        OWLSubClassOfAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLClass("A"), owlDataFactory.getOWLObjectAllValuesFrom(owlDataFactory.getOWLObjectProperty("r"), owlDataFactory.getOWLObjectIntersectionOf(owlDataFactory.getOWLClass("B"), owlDataFactory.getOWLClass("C"))));
+        String expectedSubClassOfAxiom = String.format("SubClassOf(<A> ObjectAllValuesFrom(<r> <%s>))", uuid);
+        String expectedEquivalenceAxiom = String.format("EquivalentClasses(<%s> ObjectIntersectionOf(<B> <C>))", uuid);
+        this.visitor.visit(axiom);
+        var visit = this.visitor.getVisitResult();
+        var normalizedAxioms = visit.getNormalizedAxioms();
+        var axiomsToNormalize = visit.getAxiomsToNormalize();
+
+        assertEquals(1, normalizedAxioms.size());
+        assertEquals(1, axiomsToNormalize.size());
+        assertEquals(expectedSubClassOfAxiom, normalizedAxioms.get(0).toString());
+        assertEquals(expectedEquivalenceAxiom, axiomsToNormalize.get(0).toString());
+    }
+
+    @Test
     public void testOWLSubClassOfAxiomVisitorWithUnionOfWithinConjunction_Rule4() {
         OWLSubClassOfAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLClass("A"), owlDataFactory.getOWLObjectUnionOf(owlDataFactory.getOWLClass("D"), owlDataFactory.getOWLObjectIntersectionOf(owlDataFactory.getOWLClass("B"), owlDataFactory.getOWLClass("C"))));
         String expectedSubClassOfAxiom = String.format("SubClassOf(<A> ObjectUnionOf(<D> <%s>))", uuid);
