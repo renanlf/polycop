@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import java.util.UUID;
 
@@ -18,20 +19,23 @@ import static org.junit.Assert.assertEquals;
 public class ALCHbNormalizeOWLAxiomVisitorTest {
 
     private static UUID uuid;
+    private static UUID secondUuid;
+    private static MockedStatic<UUID> uuidMock;
     private OWLDataFactory owlDataFactory;
     private ALCHbNormalizeOWLAxiomVisitor visitor;
 
     @BeforeClass
     public static void setUpBeforeClass() {
         uuid = UUID.randomUUID();
-        MockedStatic<UUID> uuidMock = Mockito.mockStatic(UUID.class);
-        uuidMock.when(UUID::randomUUID).thenReturn(uuid);
+        secondUuid = UUID.randomUUID();
+        uuidMock = Mockito.mockStatic(UUID.class);
     }
 
     @Before
     public void setUpBefore() {
         this.owlDataFactory = OWLManager.getOWLDataFactory();
         this.visitor = new ALCHbNormalizeOWLAxiomVisitor(owlDataFactory);
+        uuidMock.when(UUID::randomUUID).thenReturn(uuid, secondUuid);
     }
 
     @Test
@@ -154,5 +158,103 @@ public class ALCHbNormalizeOWLAxiomVisitorTest {
 
         assertTrue(normalizedAxioms.isEmpty());
         assertEquals(6, axiomsToNormalize.size());
+    }
+
+    @Test
+    public void testOWLSubClassOfAxiomVisitorWithIntersectionOfOnRightSide_Rule1() {
+        OWLSubClassOfAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLClass("A"), owlDataFactory.getOWLObjectIntersectionOf(owlDataFactory.getOWLClass("B"), owlDataFactory.getOWLClass("C").getObjectComplementOf()));
+        String expectedSubClassOfAxiom1 = "SubClassOf(<A> <B>)";
+        String expectedSubClassOfAxiom2 = "SubClassOf(<A> ObjectComplementOf(<C>))";
+        this.visitor.visit(axiom);
+        var visit = this.visitor.getVisitResult();
+        var normalizedAxioms = visit.getNormalizedAxioms();
+        var axiomsToNormalize = visit.getAxiomsToNormalize();
+
+        assertTrue(normalizedAxioms.isEmpty());
+        assertEquals(expectedSubClassOfAxiom1, axiomsToNormalize.get(0).toString());
+        assertEquals(expectedSubClassOfAxiom2, axiomsToNormalize.get(1).toString());
+    }
+
+    @Test
+    public void testOWLSubClassOfAxiomVisitorWithNNFUnionOfOnRightSide_Rule1() {
+        OWLSubClassOfAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLClass("A"), owlDataFactory.getOWLObjectUnionOf(owlDataFactory.getOWLClass("B"), owlDataFactory.getOWLClass("C").getObjectComplementOf()).getObjectComplementOf());
+        String expectedSubClassOfAxiom1 = "SubClassOf(<A> <C>)";
+        String expectedSubClassOfAxiom2 = "SubClassOf(<A> ObjectComplementOf(<B>))";
+        this.visitor.visit(axiom);
+        var visit = this.visitor.getVisitResult();
+        var normalizedAxioms = visit.getNormalizedAxioms();
+        var axiomsToNormalize = visit.getAxiomsToNormalize();
+
+        assertTrue(normalizedAxioms.isEmpty());
+        assertEquals(expectedSubClassOfAxiom1, axiomsToNormalize.get(0).toString());
+        assertEquals(expectedSubClassOfAxiom2, axiomsToNormalize.get(1).toString());
+    }
+
+    @Test
+    public void testOWLSubClassOfAxiomVisitorWithIntersectionOfOnRightSide_Rule8() {
+        OWLSubClassOfAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLObjectUnionOf(owlDataFactory.getOWLClass("A"), owlDataFactory.getOWLClass("B").getObjectComplementOf()), owlDataFactory.getOWLClass("C"));
+        String expectedSubClassOfAxiom1 = "SubClassOf(<A> <C>)";
+        String expectedSubClassOfAxiom2 = "SubClassOf(ObjectComplementOf(<B>) <C>)";
+        this.visitor.visit(axiom);
+        var visit = this.visitor.getVisitResult();
+        var normalizedAxioms = visit.getNormalizedAxioms();
+        var axiomsToNormalize = visit.getAxiomsToNormalize();
+
+        assertTrue(normalizedAxioms.isEmpty());
+        assertEquals(expectedSubClassOfAxiom1, axiomsToNormalize.get(0).toString());
+        assertEquals(expectedSubClassOfAxiom2, axiomsToNormalize.get(1).toString());
+    }
+
+    @Test
+    public void testOWLSubClassOfAxiomVisitorWithUnionOfWithinNonLiteralInAllValuesFiller_Rule3() {
+        OWLSubClassOfAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLClass("A"), owlDataFactory.getOWLObjectUnionOf(owlDataFactory.getOWLClass("D"), owlDataFactory.getOWLObjectAllValuesFrom(owlDataFactory.getOWLObjectProperty("r"), owlDataFactory.getOWLObjectIntersectionOf(owlDataFactory.getOWLClass("B"), owlDataFactory.getOWLClass("C")))));
+        String expectedSubClassOfAxiom = String.format("SubClassOf(<A> ObjectUnionOf(<D> ObjectAllValuesFrom(<r> <%s>)))", uuid);
+        String expectedEquivalenceAxiom = String.format("EquivalentClasses(<%s> ObjectIntersectionOf(<B> <C>))", uuid);
+        this.visitor.visit(axiom);
+        var visit = this.visitor.getVisitResult();
+        var normalizedAxioms = visit.getNormalizedAxioms();
+        var axiomsToNormalize = visit.getAxiomsToNormalize();
+
+        assertEquals(1, normalizedAxioms.size());
+        assertEquals(1, axiomsToNormalize.size());
+        assertEquals(expectedSubClassOfAxiom, normalizedAxioms.get(0).toString());
+        assertEquals(expectedEquivalenceAxiom, axiomsToNormalize.get(0).toString());
+    }
+
+    @Test
+    public void testOWLSubClassOfAxiomVisitorWithUnionOfWithinConjunction_Rule4() {
+        OWLSubClassOfAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLClass("A"), owlDataFactory.getOWLObjectUnionOf(owlDataFactory.getOWLClass("D"), owlDataFactory.getOWLObjectIntersectionOf(owlDataFactory.getOWLClass("B"), owlDataFactory.getOWLClass("C"))));
+        String expectedSubClassOfAxiom = String.format("SubClassOf(<A> ObjectUnionOf(<D> <%s>))", uuid);
+        String expectedEquivalenceAxiom = String.format("EquivalentClasses(<%s> ObjectIntersectionOf(<B> <C>))", uuid);
+        this.visitor.visit(axiom);
+        var visit = this.visitor.getVisitResult();
+        var normalizedAxioms = visit.getNormalizedAxioms();
+        var axiomsToNormalize = visit.getAxiomsToNormalize();
+
+        assertEquals(1, normalizedAxioms.size());
+        assertEquals(1, axiomsToNormalize.size());
+        assertEquals(expectedSubClassOfAxiom, normalizedAxioms.get(0).toString());
+        assertEquals(expectedEquivalenceAxiom, axiomsToNormalize.get(0).toString());
+    }
+
+    @Test
+    public void testOWLSubClassOfAxiomVisitorWithUnionOfWithinConjunctionAndNonLiteralInAllValuesFiller_Rule3And4() {
+        OWLSubClassOfAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLClass("A"), owlDataFactory.getOWLObjectUnionOf(
+                owlDataFactory.getOWLClass("D"),
+                owlDataFactory.getOWLObjectIntersectionOf(owlDataFactory.getOWLClass("B"), owlDataFactory.getOWLClass("C")),
+                owlDataFactory.getOWLObjectAllValuesFrom(owlDataFactory.getOWLObjectProperty("r"), owlDataFactory.getOWLObjectIntersectionOf(owlDataFactory.getOWLClass("E"), owlDataFactory.getOWLClass("F")))));
+        String expectedSubClassOfAxiom = String.format("SubClassOf(<A> ObjectUnionOf(<D> <%s> ObjectAllValuesFrom(<r> <%s>)))", uuid, secondUuid);
+        String expectedEquivalenceAxiom1 = String.format("EquivalentClasses(<%s> ObjectIntersectionOf(<B> <C>))", uuid);
+        String expectedEquivalenceAxiom2 = String.format("EquivalentClasses(<%s> ObjectIntersectionOf(<E> <F>))", secondUuid);
+        this.visitor.visit(axiom);
+        var visit = this.visitor.getVisitResult();
+        var normalizedAxioms = visit.getNormalizedAxioms();
+        var axiomsToNormalize = visit.getAxiomsToNormalize();
+
+        assertEquals(1, normalizedAxioms.size());
+        assertEquals(2, axiomsToNormalize.size());
+        assertEquals(expectedSubClassOfAxiom, normalizedAxioms.get(0).toString());
+        assertEquals(expectedEquivalenceAxiom1, axiomsToNormalize.get(0).toString());
+        assertEquals(expectedEquivalenceAxiom2, axiomsToNormalize.get(1).toString());
     }
 }
