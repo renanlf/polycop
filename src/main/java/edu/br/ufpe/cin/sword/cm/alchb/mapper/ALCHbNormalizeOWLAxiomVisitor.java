@@ -73,6 +73,9 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
             // RULE 2
             var axiomsToNormalize = ((OWLObjectIntersectionOf) rightSideClassExpression).operands().map(operand -> owlDataFactory.getOWLSubClassOfAxiom(leftSideClassExpression, operand)).toList();
             this.visitResult = new ALCHbOWLAxiomVisit(List.of(), axiomsToNormalize);
+        } else if (rightSideClassExpression.getClassExpressionType() == ClassExpressionType.OBJECT_UNION_OF) {
+            // RULE 3 and 4 (inside union)
+            checkRule3And4(leftSideClassExpression, (OWLObjectUnionOf) rightSideClassExpression);
         } else if (rightSideClassExpression instanceof  OWLObjectAllValuesFrom allValuesFrom && !allValuesFrom.getFiller().isClassExpressionLiteral()) {
             // RULE 3 (without union)
             var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
@@ -80,13 +83,34 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
                     List.of(owlDataFactory.getOWLSubClassOfAxiom(leftSideClassExpression, owlDataFactory.getOWLObjectAllValuesFrom(allValuesFrom.getProperty(), newClass))),
                     List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, allValuesFrom.getFiller()))
             );
-        } else if (rightSideClassExpression.getClassExpressionType() == ClassExpressionType.OBJECT_UNION_OF) {
-            // RULE 3 and 4 (inside union)
-            checkRule3And4(leftSideClassExpression, (OWLObjectUnionOf) rightSideClassExpression);
+        } else if (rightSideClassExpression instanceof  OWLObjectSomeValuesFrom someValuesFrom && !someValuesFrom.getFiller().isClassExpressionLiteral()) {
+            // RULE 5
+            var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
+            this.visitResult = new ALCHbOWLAxiomVisit(
+                    List.of(owlDataFactory.getOWLSubClassOfAxiom(leftSideClassExpression, owlDataFactory.getOWLObjectSomeValuesFrom(someValuesFrom.getProperty(), newClass))),
+                    List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, someValuesFrom.getFiller()))
+            );
         } else if (leftSideClassExpression.getClassExpressionType() == ClassExpressionType.OBJECT_UNION_OF) {
             // RULE 8
             var axiomsToNormalize = ((OWLObjectUnionOf) leftSideClassExpression).operands().map(operand -> owlDataFactory.getOWLSubClassOfAxiom(operand, rightSideClassExpression)).toList();
             this.visitResult = new ALCHbOWLAxiomVisit(List.of(), axiomsToNormalize);
+        } else if (leftSideClassExpression.getClassExpressionType() == ClassExpressionType.OBJECT_INTERSECTION_OF) {
+            // RULE 9 and 10 (inside intersection)
+            checkRule9And10((OWLObjectIntersectionOf) leftSideClassExpression, rightSideClassExpression);
+        } else if (leftSideClassExpression instanceof  OWLObjectSomeValuesFrom someValuesFrom && !someValuesFrom.getFiller().isClassExpressionLiteral()) {
+            // RULE 10 (without intersection)
+            var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
+            this.visitResult = new ALCHbOWLAxiomVisit(
+                    List.of(owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLObjectSomeValuesFrom(someValuesFrom.getProperty(), newClass), rightSideClassExpression)),
+                    List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, someValuesFrom.getFiller()))
+            );
+        } else if (leftSideClassExpression instanceof  OWLObjectAllValuesFrom allValuesFrom && !allValuesFrom.getFiller().isClassExpressionLiteral()) {
+            // RULE 11
+            var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
+            this.visitResult = new ALCHbOWLAxiomVisit(
+                    List.of(owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLObjectAllValuesFrom(allValuesFrom.getProperty(), newClass), rightSideClassExpression)),
+                    List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, allValuesFrom.getFiller()))
+            );
         } else {
             this.visitResult = new ALCHbOWLAxiomVisit(List.of(axiom), List.of());
         }
@@ -110,6 +134,27 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
         }
         this.visitResult = new ALCHbOWLAxiomVisit(
                 List.of(owlDataFactory.getOWLSubClassOfAxiom(leftSideClassExpression, owlDataFactory.getOWLObjectUnionOf(pureDisjunctions))),
+                newAxioms);
+    }
+
+    private void checkRule9And10(OWLObjectIntersectionOf leftSideClassExpression, OWLClassExpression rightSideClassExpression) {
+        var pureConjunctions = new HashSet<OWLClassExpression>();
+        var newAxioms = new ArrayList<OWLEquivalentClassesAxiom>();
+        for (var classExpression : leftSideClassExpression.getOperands()) {
+            if (classExpression.isClassExpressionLiteral()) {
+                pureConjunctions.add(classExpression);
+            } else if (classExpression instanceof OWLObjectSomeValuesFrom someValues && !someValues.getFiller().isClassExpressionLiteral()) {
+                var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
+                pureConjunctions.add(owlDataFactory.getOWLObjectSomeValuesFrom(someValues.getProperty(), newClass));
+                newAxioms.add(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, someValues.getFiller()));
+            } else if (DISJUNCTIONS.contains(classExpression.getClassExpressionType())) {
+                var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
+                pureConjunctions.add(newClass);
+                newAxioms.add(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, classExpression));
+            }
+        }
+        this.visitResult = new ALCHbOWLAxiomVisit(
+                List.of(owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLObjectIntersectionOf(pureConjunctions), rightSideClassExpression)),
                 newAxioms);
     }
 
