@@ -21,6 +21,8 @@ public class ALCHbMapOWLAxiomVisitorTest {
 
     private static UUID uuid;
     private static UUID secondUuid;
+    private static UUID thirdUuid;
+    private static UUID fourthUuid;
     private static MockedStatic<UUID> uuidMock;
     private OWLDataFactory owlDataFactory;
     private ALCHbMapOWLAxiomVisitor visitor;
@@ -29,6 +31,8 @@ public class ALCHbMapOWLAxiomVisitorTest {
     public static void setUpBeforeClass() {
         uuid = UUID.randomUUID();
         secondUuid = UUID.randomUUID();
+        thirdUuid = UUID.randomUUID();
+        fourthUuid = UUID.randomUUID();
         uuidMock = Mockito.mockStatic(UUID.class);
     }
 
@@ -36,7 +40,7 @@ public class ALCHbMapOWLAxiomVisitorTest {
     public void setUp() {
         this.visitor = new ALCHbMapOWLAxiomVisitor(new ALCHbFactory());
         this.owlDataFactory = OWLManager.getOWLDataFactory();
-        uuidMock.when(UUID::randomUUID).thenReturn(uuid, secondUuid);
+        uuidMock.when(UUID::randomUUID).thenReturn(uuid, secondUuid, thirdUuid, fourthUuid);
     }
 
     @Test
@@ -110,5 +114,61 @@ public class ALCHbMapOWLAxiomVisitorTest {
         assertEquals("~s", matrix.get(0).get(1).getLiteralName());
         assertEquals(uuid.toString(), ((ALCHbRoleLiteral) matrix.get(0).get(1)).getFirst().getName());
         assertEquals(secondUuid.toString(), ((ALCHbRoleLiteral) matrix.get(0).get(1)).getSecond().getName());
+    }
+
+    @Test
+    public void testMapSubClassOfAxiom_LeftSidePureConjunctionRightSidePureDisjunction() {
+        OWLAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(
+                owlDataFactory.getOWLObjectIntersectionOf(
+                        owlDataFactory.getOWLClass("A"),
+                        owlDataFactory.getOWLObjectSomeValuesFrom(owlDataFactory.getOWLObjectProperty("r"), owlDataFactory.getOWLClass("B"))
+                ), owlDataFactory.getOWLObjectUnionOf(
+                        owlDataFactory.getOWLClass("C"),
+                        owlDataFactory.getOWLObjectAllValuesFrom(owlDataFactory.getOWLObjectProperty("s"), owlDataFactory.getOWLClass("D").getObjectComplementOf())
+                )
+        );
+
+        var matrix = this.visitor.visit(axiom);
+        assertEquals(1, matrix.size());
+        assertEquals(6, matrix.get(0).size());
+        assertTrue(matrix.get(0).get(0).isPositive());
+        assertEquals(String.format("A(%s)", uuid), matrix.get(0).get(0).toString());
+        assertEquals(String.format("r(%s, %s)", uuid, secondUuid), matrix.get(0).get(1).toString());
+        assertEquals(String.format("B(%s)", secondUuid), matrix.get(0).get(2).toString());
+        assertEquals(String.format("\\nao C(%s)", uuid), matrix.get(0).get(3).toString());
+        assertEquals(String.format("s(%s, %s)", uuid, thirdUuid), matrix.get(0).get(4).toString());
+        assertEquals(String.format("D(%s)", thirdUuid), matrix.get(0).get(5).toString());
+    }
+
+    @Test
+    public void testMapSubClassOfAxiom_LeftSideLiteralRightSideSomeValuesFrom() {
+        OWLAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(
+                owlDataFactory.getOWLClass("A").getObjectComplementOf(),
+                owlDataFactory.getOWLObjectSomeValuesFrom(owlDataFactory.getOWLObjectProperty("s"), owlDataFactory.getOWLClass("B"))
+        );
+
+        var matrix = this.visitor.visit(axiom);
+        assertEquals(2, matrix.size());
+        assertEquals(2, matrix.get(0).size());
+        assertEquals(String.format("\\nao A(%s)", uuid), matrix.get(0).get(0).toString());
+        assertEquals(String.format("\\nao s(%s, %s_{%s})", uuid, thirdUuid, uuid), matrix.get(0).get(1).toString());
+        assertEquals(String.format("\\nao A(%s)", secondUuid), matrix.get(1).get(0).toString());
+        assertEquals(String.format("\\nao B(%s_{%s})", fourthUuid, secondUuid), matrix.get(1).get(1).toString());
+    }
+
+    @Test
+    public void testMapSubClassOfAxiom_LeftSideAllValuesFromRightSideLiteral() {
+        OWLAxiom axiom = owlDataFactory.getOWLSubClassOfAxiom(
+                owlDataFactory.getOWLObjectAllValuesFrom(owlDataFactory.getOWLObjectProperty("r"), owlDataFactory.getOWLClass("A")),
+                owlDataFactory.getOWLClass("B")
+        );
+
+        var matrix = this.visitor.visit(axiom);
+        assertEquals(2, matrix.size());
+        assertEquals(2, matrix.get(0).size());
+        assertEquals(String.format("\\nao B(%s)", uuid), matrix.get(0).get(0).toString());
+        assertEquals(String.format("\\nao r(%s, %s_{%s})", uuid, thirdUuid, uuid), matrix.get(0).get(1).toString());
+        assertEquals(String.format("\\nao B(%s)", secondUuid), matrix.get(1).get(0).toString());
+        assertEquals(String.format("A(%s_{%s})", fourthUuid, secondUuid), matrix.get(1).get(1).toString());
     }
 }
