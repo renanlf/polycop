@@ -4,8 +4,10 @@ import edu.br.ufpe.cin.sword.cm.alchb.factories.ALCHbFactory;
 import edu.br.ufpe.cin.sword.cm.alchb.mapper.exceptions.IllegalOWLAxiomException;
 import edu.br.ufpe.cin.sword.cm.alchb.mapper.exceptions.TypicalityNormalFormException;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbLiteral;
+import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbTerm;
 import org.semanticweb.owlapi.model.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +28,8 @@ public class ALCHbMapOWLAxiomVisitor {
             return this.visit((OWLNegativeObjectPropertyAssertionAxiom) axiom, false);
         } else if (axiom.isOfType(AxiomType.SUB_OBJECT_PROPERTY)) {
             return this.visit((OWLSubObjectPropertyOfAxiom) axiom);
+        } else if (axiom.isOfType(AxiomType.SUBCLASS_OF)) {
+            return this.visit((OWLSubClassOfAxiom) axiom);
         } else {
             throw new IllegalOWLAxiomException(axiom);
         }
@@ -73,5 +77,61 @@ public class ALCHbMapOWLAxiomVisitor {
                 alchbFactory.roleLiteral(subPropertyName, true, firstTerm, secondTerm),
                 alchbFactory.roleLiteral(superPropertyName, false, firstTerm, secondTerm)
         ));
+    }
+
+    private List<List<ALCHbLiteral>> visit(OWLSubClassOfAxiom axiom) {
+        var leftClassExpression = axiom.getSubClass();
+        var nnfRightClassExpression = axiom.getSuperClass().getComplementNNF();
+
+        var x1 = alchbFactory.var(UUID.randomUUID().toString());
+
+        if (nnfRightClassExpression instanceof OWLObjectAllValuesFrom allValuesFrom) {
+            return createMatrixWithAllValuesFrom(allValuesFrom, leftClassExpression, x1);
+        } else if (leftClassExpression instanceof OWLObjectAllValuesFrom allValuesFrom) {
+            return createMatrixWithAllValuesFrom(allValuesFrom, nnfRightClassExpression, x1);
+        } else {
+            var conjuncts = new ArrayList<OWLClassExpression>();
+            conjuncts.addAll(leftClassExpression.asConjunctSet());
+            conjuncts.addAll(nnfRightClassExpression.asConjunctSet());
+
+            var clause = new ArrayList<ALCHbLiteral>();
+            for (var classExpression : conjuncts) {
+                if (classExpression instanceof OWLClass owlClass) {
+                    clause.add(alchbFactory.conLiteral(owlClass.getIRI().getShortForm(), true, x1));
+                } else if (classExpression instanceof OWLObjectComplementOf complementOf) {
+                    clause.add(alchbFactory.conLiteral(complementOf.getOperand().asOWLClass().getIRI().getShortForm(), false, x1));
+                } else if (classExpression instanceof OWLObjectSomeValuesFrom someValuesFrom) {
+                    var y1 = alchbFactory.var(UUID.randomUUID().toString());
+                    var propName = someValuesFrom.getProperty().getNamedProperty().getIRI().getShortForm();
+                    var fillerClassName = someValuesFrom.getFiller().asOWLClass().getIRI().getShortForm();
+                    clause.add(alchbFactory.roleLiteral(propName, true, x1, y1));
+                    clause.add(alchbFactory.conLiteral(fillerClassName, true, y1));
+                } else {
+                    throw new TypicalityNormalFormException(axiom);
+                }
+            }
+
+            return List.of(List.copyOf(clause));
+        }
+    }
+
+    private List<List<ALCHbLiteral>> createMatrixWithAllValuesFrom(OWLObjectAllValuesFrom allValuesFrom, OWLClassExpression otherLiteralExpression, ALCHbTerm x1) {
+        var x2 = alchbFactory.var(UUID.randomUUID().toString());
+        var aX1 = alchbFactory.unaryInd(UUID.randomUUID().toString(), x1);
+        var aX2 = alchbFactory.unaryInd(UUID.randomUUID().toString(), x2);
+        var positive = otherLiteralExpression.isOWLClass();
+        var className = positive
+                ? otherLiteralExpression.asOWLClass().getIRI().getShortForm()
+                : otherLiteralExpression.getComplementNNF().asOWLClass().getIRI().getShortForm();
+        var fillerIsPositive = allValuesFrom.getFiller().isOWLClass();
+        var fillerClassName = fillerIsPositive
+                ? allValuesFrom.getFiller().asOWLClass().getIRI().getShortForm()
+                : allValuesFrom.getFiller().getComplementNNF().asOWLClass().getIRI().getShortForm();
+        var propName = allValuesFrom.getProperty().getNamedProperty().getIRI().getShortForm();
+
+        return List.of(
+                List.of(alchbFactory.conLiteral(className, positive, x1), alchbFactory.roleLiteral(propName, false, x1, aX1)),
+                List.of(alchbFactory.conLiteral(className, positive, x2), alchbFactory.conLiteral(fillerClassName, fillerIsPositive, aX2))
+        );
     }
 }
