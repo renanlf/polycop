@@ -128,4 +128,64 @@ public class ALCHProverTest {
         // THEN
         assertTrue(result instanceof AxiomProofTree<ALCHbLiteral>);
     }
+
+    @Test
+    public void testProveOntology10() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/10_test_skolem_inconsistency.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof StartProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology11() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/11_test_skolem_consistency.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology12() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/12_test_path_instantiation_consistency.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology13() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/13_test_cyclic_consistency001.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology14() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/14_test_cyclic_inconsistency001.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof StartProofTree<ALCHbLiteral>);
+    }
 }

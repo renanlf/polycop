@@ -124,4 +124,64 @@ public class ALCHOWLAPIMapperTest {
         // THEN
         System.out.println(matrix);
     }
+
+    @Test
+    public void testMapOntology10() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/10_test_skolem_inconsistency.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology11() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/11_test_skolem_consistency.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology12() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/12_test_path_instantiation_consistency.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology13() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/13_test_cyclic_consistency001.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology14() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/14_test_cyclic_inconsistency001.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
 }
