@@ -1,6 +1,7 @@
-package edu.br.ufpe.cin.sword.cm.alchb.mapper;
+package edu.br.ufpe.cin.sword.cm.alch.mapper;
 
 import edu.br.ufpe.cin.sword.cm.alchb.factories.ALCHbFactory;
+import edu.br.ufpe.cin.sword.cm.alchb.mapper.ALCHbMapOWLAxiomVisitor;
 import edu.br.ufpe.cin.sword.cm.alchb.mapper.exceptions.TypicalityNormalFormException;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbConceptLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbRoleLiteral;

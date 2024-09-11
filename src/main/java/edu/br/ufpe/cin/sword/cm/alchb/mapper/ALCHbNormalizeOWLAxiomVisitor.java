@@ -1,5 +1,6 @@
 package edu.br.ufpe.cin.sword.cm.alchb.mapper;
 
+import edu.br.ufpe.cin.sword.cm.alchb.mapper.exceptions.IllegalOWLAxiomException;
 import org.semanticweb.owlapi.model.*;
 
 import java.util.ArrayList;
@@ -28,6 +29,10 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
             this.visit((OWLObjectPropertyAssertionAxiom) axiom);
         } else if (axiom.isOfType(AxiomType.SUB_OBJECT_PROPERTY)) {
             this.visit((OWLSubObjectPropertyOfAxiom) axiom);
+        } else if (axiom.isOfType(AxiomType.SUBCLASS_OF)) {
+            this.visit((OWLSubClassOfAxiom) axiom);
+        } else {
+            throw new IllegalOWLAxiomException(axiom);
         }
 
         return visitResult;
@@ -35,13 +40,15 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
 
     @Override
     public void visit(OWLClassAssertionAxiom axiom) {
-        if (axiom.getClassExpression().isClassExpressionLiteral()) {
+        var classExpression = axiom.getClassExpression().getNNF();
+
+        if (classExpression.isClassExpressionLiteral()) {
             this.visitResult = new ALCHbOWLAxiomVisit(List.of(axiom), List.of());
         } else {
             OWLClass newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
             this.visitResult = new ALCHbOWLAxiomVisit(
                     List.of(owlDataFactory.getOWLClassAssertionAxiom(newClass, axiom.getIndividual())),
-                    List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, axiom.getClassExpression()))
+                    List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, classExpression))
             );
         }
     }
@@ -66,7 +73,6 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
 
     @Override
     public void visit(OWLSubClassOfAxiom axiom) {
-        // TODO
         var leftSideClassExpression = axiom.getSubClass().getNNF();
         var rightSideClassExpression = axiom.getSuperClass().getNNF();
         if (rightSideClassExpression.getClassExpressionType() == ClassExpressionType.OBJECT_INTERSECTION_OF) {

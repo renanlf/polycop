@@ -1,5 +1,6 @@
-package edu.br.ufpe.cin.sword.cm.alchb.mapper;
+package edu.br.ufpe.cin.sword.cm.alch.mapper;
 
+import edu.br.ufpe.cin.sword.cm.alchb.mapper.ALCHbNormalizeOWLAxiomVisitor;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

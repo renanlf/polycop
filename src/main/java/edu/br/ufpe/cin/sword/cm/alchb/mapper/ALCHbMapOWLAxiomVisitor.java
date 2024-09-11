@@ -40,16 +40,26 @@ public class ALCHbMapOWLAxiomVisitor {
             throw new TypicalityNormalFormException(axiom);
         }
 
-        boolean positive = axiom.getClassExpression().isOWLClass();
-        String conceptName = positive
-                ? axiom.getClassExpression().asOWLClass().getIRI().getShortForm()
-                : ((OWLObjectComplementOf) axiom.getClassExpression()).getOperand().asOWLClass().getIRI().getShortForm();
+        var classExpression = axiom.getClassExpression().getNNF();
 
-        return List.of(List.of(alchbFactory.conLiteral(
-                conceptName,
-                !positive,
-                alchbFactory.ind(axiom.getIndividual().toStringID())
-        )));
+        if (classExpression.isOWLThing()) {
+            // if it is Thing, then the negation is Nothing
+            return List.of(List.of());
+        } else if (classExpression.isOWLNothing()) {
+            // if it is Nothing, then the negation is Thing
+            return List.of();
+        } else {
+            boolean positive = classExpression.isOWLClass();
+            String conceptName = positive
+                    ? classExpression.asOWLClass().getIRI().getShortForm()
+                    : ((OWLObjectComplementOf) classExpression).getOperand().asOWLClass().getIRI().getShortForm();
+
+            return List.of(List.of(alchbFactory.conLiteral(
+                    conceptName,
+                    !positive,
+                    alchbFactory.ind(axiom.getIndividual().toStringID())
+            )));
+        }
     }
 
     private List<List<ALCHbLiteral>> visit(OWLPropertyAssertionAxiom<OWLObjectPropertyExpression, OWLIndividual> axiom, boolean positive) {
@@ -81,7 +91,7 @@ public class ALCHbMapOWLAxiomVisitor {
 
     private List<List<ALCHbLiteral>> visit(OWLSubClassOfAxiom axiom) {
         var leftClassExpression = axiom.getSubClass();
-        var nnfRightClassExpression = axiom.getSuperClass().getComplementNNF();
+        var nnfRightClassExpression = axiom.getSuperClass().getObjectComplementOf().getNNF();
 
         var x1 = alchbFactory.var(UUID.randomUUID().toString());
 
@@ -94,8 +104,12 @@ public class ALCHbMapOWLAxiomVisitor {
             conjuncts.addAll(leftClassExpression.asConjunctSet());
             conjuncts.addAll(nnfRightClassExpression.asConjunctSet());
 
-            var clause = new ArrayList<ALCHbLiteral>();
+            List<ALCHbLiteral> clause = new ArrayList<>();
             for (var classExpression : conjuncts) {
+                if (classExpression.isOWLThing()) {
+                    continue;
+                }
+
                 if (classExpression instanceof OWLClass owlClass) {
                     clause.add(alchbFactory.conLiteral(owlClass.getIRI().getShortForm(), true, x1));
                 } else if (classExpression instanceof OWLObjectComplementOf complementOf) {
@@ -103,13 +117,22 @@ public class ALCHbMapOWLAxiomVisitor {
                 } else if (classExpression instanceof OWLObjectSomeValuesFrom someValuesFrom) {
                     var y1 = alchbFactory.var(UUID.randomUUID().toString());
                     var propName = someValuesFrom.getProperty().getNamedProperty().getIRI().getShortForm();
-                    var fillerClassName = someValuesFrom.getFiller().asOWLClass().getIRI().getShortForm();
+                    var fillerIsPositive = someValuesFrom.getFiller().isOWLClass();
+                    var fillerClassName = fillerIsPositive
+                            ? someValuesFrom.getFiller().asOWLClass().getIRI().getShortForm()
+                            : someValuesFrom.getFiller().getComplementNNF().asOWLClass().getIRI().getShortForm();
                     clause.add(alchbFactory.roleLiteral(propName, true, x1, y1));
-                    clause.add(alchbFactory.conLiteral(fillerClassName, true, y1));
+                    clause.add(alchbFactory.conLiteral(fillerClassName, fillerIsPositive, y1));
                 } else {
                     throw new TypicalityNormalFormException(axiom);
                 }
             }
+
+            if (clause.isEmpty()) {
+                return List.of();
+            }
+
+            clause = clause.stream().filter(literal -> !literal.getName().equals("Nothing")).toList();
 
             return List.of(List.copyOf(clause));
         }
@@ -117,8 +140,9 @@ public class ALCHbMapOWLAxiomVisitor {
 
     private List<List<ALCHbLiteral>> createMatrixWithAllValuesFrom(OWLObjectAllValuesFrom allValuesFrom, OWLClassExpression otherLiteralExpression, ALCHbTerm x1) {
         var x2 = alchbFactory.var(UUID.randomUUID().toString());
-        var aX1 = alchbFactory.unaryInd(UUID.randomUUID().toString(), x1);
-        var aX2 = alchbFactory.unaryInd(UUID.randomUUID().toString(), x2);
+        var aName = UUID.randomUUID().toString();
+        var aX1 = alchbFactory.unaryInd(aName, x1);
+        var aX2 = alchbFactory.unaryInd(aName, x2);
         var positive = otherLiteralExpression.isOWLClass();
         var className = positive
                 ? otherLiteralExpression.asOWLClass().getIRI().getShortForm()
