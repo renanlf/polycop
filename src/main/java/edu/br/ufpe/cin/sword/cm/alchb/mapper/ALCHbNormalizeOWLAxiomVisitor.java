@@ -31,6 +31,8 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
             this.visit((OWLSubObjectPropertyOfAxiom) axiom);
         } else if (axiom.isOfType(AxiomType.SUBCLASS_OF)) {
             this.visit((OWLSubClassOfAxiom) axiom);
+        }else if (axiom.isOfType(AxiomType.DISJOINT_CLASSES)) {
+            this.visit((OWLDisjointClassesAxiom) axiom);
         } else {
             throw new IllegalOWLAxiomException(axiom);
         }
@@ -68,6 +70,11 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
 
     @Override
     public void visit(OWLEquivalentClassesAxiom axiom) {
+        this.visitResult = new ALCHbOWLAxiomVisit(List.of(), axiom.asOWLSubClassOfAxioms().stream().toList());
+    }
+
+    @Override
+    public void visit(OWLDisjointClassesAxiom axiom) {
         this.visitResult = new ALCHbOWLAxiomVisit(List.of(), axiom.asOWLSubClassOfAxioms().stream().toList());
     }
 
@@ -147,9 +154,7 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
         var pureConjunctions = new HashSet<OWLClassExpression>();
         var newAxioms = new ArrayList<OWLEquivalentClassesAxiom>();
         for (var classExpression : leftSideClassExpression.getOperands()) {
-            if (classExpression.isClassExpressionLiteral()) {
-                pureConjunctions.add(classExpression);
-            } else if (classExpression instanceof OWLObjectSomeValuesFrom someValues && !someValues.getFiller().isClassExpressionLiteral()) {
+            if (classExpression instanceof OWLObjectSomeValuesFrom someValues && !someValues.getFiller().isClassExpressionLiteral()) {
                 var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
                 pureConjunctions.add(owlDataFactory.getOWLObjectSomeValuesFrom(someValues.getProperty(), newClass));
                 newAxioms.add(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, someValues.getFiller()));
@@ -157,6 +162,8 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
                 var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
                 pureConjunctions.add(newClass);
                 newAxioms.add(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, classExpression));
+            } else {
+                pureConjunctions.add(classExpression);
             }
         }
         this.visitResult = new ALCHbOWLAxiomVisit(
