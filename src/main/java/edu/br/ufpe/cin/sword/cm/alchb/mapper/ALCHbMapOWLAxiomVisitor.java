@@ -57,7 +57,7 @@ public class ALCHbMapOWLAxiomVisitor {
             return List.of(List.of(alchbFactory.conLiteral(
                     conceptName,
                     !positive,
-                    alchbFactory.ind(axiom.getIndividual().toStringID())
+                    alchbFactory.ind(axiom.getIndividual().asOWLNamedIndividual().getIRI().getShortForm())
             )));
         }
     }
