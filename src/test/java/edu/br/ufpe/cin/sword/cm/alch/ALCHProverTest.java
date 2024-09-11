@@ -7,7 +7,6 @@ import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.StartProofTree;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 
 import java.io.File;
 
