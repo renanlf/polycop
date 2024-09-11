@@ -7,6 +7,7 @@ import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.StartProofTree;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.internal.runners.statements.Fail;
 
 import java.io.File;
 
@@ -187,5 +188,41 @@ public class ALCHProverTest {
 
         // THEN
         assertTrue(result instanceof StartProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology15() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/15_test_cyclic_consistency002.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology16() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/16_test_cyclic_inconsistency002.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof StartProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology17() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/17_test_cyclic_consistency003.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
     }
 }

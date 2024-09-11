@@ -121,8 +121,12 @@ public class ALCHbMapOWLAxiomVisitor {
                     var fillerClassName = fillerIsPositive
                             ? someValuesFrom.getFiller().asOWLClass().getIRI().getShortForm()
                             : someValuesFrom.getFiller().getComplementNNF().asOWLClass().getIRI().getShortForm();
+
+                    if(!fillerClassName.equals("Thing")) {
+                        clause.add(alchbFactory.conLiteral(fillerClassName, fillerIsPositive, y1));
+                    }
                     clause.add(alchbFactory.roleLiteral(propName, true, x1, y1));
-                    clause.add(alchbFactory.conLiteral(fillerClassName, fillerIsPositive, y1));
+
                 } else {
                     throw new TypicalityNormalFormException(axiom);
                 }
@@ -152,6 +156,36 @@ public class ALCHbMapOWLAxiomVisitor {
                 ? allValuesFrom.getFiller().asOWLClass().getIRI().getShortForm()
                 : allValuesFrom.getFiller().getComplementNNF().asOWLClass().getIRI().getShortForm();
         var propName = allValuesFrom.getProperty().getNamedProperty().getIRI().getShortForm();
+
+        if (className.equals("Nothing")) {
+            return List.of(List.of());
+        }
+
+        if (className.equals("Thing")) {
+            if (fillerClassName.equals("Nothing")) {
+                return List.of(List.of(alchbFactory.roleLiteral(propName, false, x1, aX1)));
+            }
+
+            if (fillerClassName.equals("Thing")) {
+                return List.of();
+            }
+
+            return List.of(
+                    List.of(alchbFactory.roleLiteral(propName, false, x1, aX1)),
+                    List.of(alchbFactory.conLiteral(fillerClassName, fillerIsPositive, aX2))
+            );
+        }
+
+        if (fillerClassName.equals("Nothing")) {
+            return List.of(List.of(alchbFactory.conLiteral(className, positive, x1), alchbFactory.roleLiteral(propName, false, x1, aX1)));
+        }
+
+        if (fillerClassName.equals("Thing")) {
+            return List.of(
+                    List.of(alchbFactory.conLiteral(className, positive, x1), alchbFactory.roleLiteral(propName, false, x1, aX1)),
+                    List.of(alchbFactory.conLiteral(className, positive, x2))
+            );
+        }
 
         return List.of(
                 List.of(alchbFactory.conLiteral(className, positive, x1), alchbFactory.roleLiteral(propName, false, x1, aX1)),

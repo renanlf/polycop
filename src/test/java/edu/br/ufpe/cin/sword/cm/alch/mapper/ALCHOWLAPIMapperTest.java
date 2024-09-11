@@ -184,4 +184,40 @@ public class ALCHOWLAPIMapperTest {
         // THEN
         System.out.println(matrix);
     }
+
+    @Test
+    public void testMapOntology15() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/15_test_cyclic_consistency002.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology16() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/16_test_cyclic_inconsistency002.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology17() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/17_test_cyclic_consistency003.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
 }
