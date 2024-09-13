@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import edu.br.ufpe.cin.sword.cm.alchb.factories.ALCHbFactory;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbBiOrderedLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbConceptLiteral;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbLiteral;
@@ -149,10 +150,16 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 		if (Objects.equals(term, other)) return Map.entry(NULL_VAR, NULL_VAR);
 		
 		if (term instanceof ALCHbVariable) {
+			if (other instanceof ALCHbUnaryIndividual unaryIndividual && unaryIndividual.getFillerTerm().equals(term)) {
+				return null;
+			}
 			return Map.entry((ALCHbVariable) term, other);
 		}
 
 		if (other instanceof ALCHbVariable) {
+			if (term instanceof ALCHbUnaryIndividual unaryIndividual && unaryIndividual.getFillerTerm().equals(other)) {
+				return null;
+			}
 			return Map.entry((ALCHbVariable) other, term);
 		}
 		
@@ -181,6 +188,11 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 	}
 	
 	private ALCHbTerm getSubstitution(ALCHbTerm term) {
+		if (term instanceof ALCHbUnaryIndividual unaryIndividual) {
+			var fillerTerm = getSubstitution(unaryIndividual.getFillerTerm());
+			return new ALCHbFactory().unaryInd(unaryIndividual.getName(), fillerTerm);
+		}
+
 		while (subs.containsKey(term)) {
 			term = subs.get(term);
 		}

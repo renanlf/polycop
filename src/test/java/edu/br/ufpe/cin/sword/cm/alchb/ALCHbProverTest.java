@@ -40,16 +40,16 @@ public class ALCHbProverTest {
 			factory.clauseOf(factory.conLiteral("A", false, a)),
 			factory.clauseOf(factory.conLiteral("A", true, a))
 		));
-		
+
 		assertTrue(proof instanceof StartProofTree<?>);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(factory.conLiteral("A", true, a)),
 				factory.clauseOf(factory.conLiteral("A", true, a))
 		));
-			
+
 		assertTrue(proof instanceof FailProofTree<?>);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, a),
@@ -57,9 +57,9 @@ public class ALCHbProverTest {
 				),
 				factory.clauseOf(factory.conLiteral("A", false, a))
 		));
-			
+
 		assertTrue(proof instanceof FailProofTree<?>);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, a),
@@ -68,11 +68,11 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, a)),
 				factory.clauseOf(factory.conLiteral("B", true, a))
 		));
-			
+
 		assertTrue(proof instanceof StartProofTree<?>);
-		
+
 		ALCHbVariable x = factory.var("x");
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, x),
@@ -81,9 +81,9 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, a)),
 				factory.clauseOf(factory.conLiteral("B", true, factory.ind("b")))
 		));
-			
+
 		assertTrue(proof instanceof FailProofTree<?>);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -92,9 +92,9 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.ind("a"))),
 				factory.clauseOf(factory.conLiteral("B", true, factory.ind("b")))
 		));
-			
+
 		assertTrue(proof instanceof FailProofTree<?>);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -103,10 +103,10 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.ind("a"))),
 				factory.clauseOf(factory.conLiteral("B", true, factory.ind("a")))
 		));
-			
+
 		assertTrue(proof instanceof StartProofTree<?>);
 		System.out.println(proof);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -115,10 +115,10 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.ind("a"))),
 				factory.clauseOf(factory.conLiteral("B", true, factory.ind("b")))
 		));
-			
+
 		assertTrue(proof instanceof StartProofTree<?>);
 		System.out.println(proof);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -127,10 +127,10 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.ind("a"))),
 				factory.clauseOf(factory.conLiteral("B", true, factory.var("z")))
 		));
-			
+
 		assertTrue(proof instanceof StartProofTree<?>);
 		System.out.println(proof);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -139,9 +139,9 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.ind("a"))),
 				factory.clauseOf(factory.conLiteral("B", true, factory.unaryInd("f", factory.var("x"))))
 		));
-			
+
 		assertTrue(proof instanceof FailProofTree<?>);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -150,9 +150,9 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.unaryInd("f", factory.var("x")))),
 				factory.clauseOf(factory.conLiteral("B", true,  factory.unaryInd("f", factory.var("x"))))
 		));
-			
-		assertTrue(proof instanceof FailProofTree<?>);
-		
+
+		assertTrue(proof instanceof StartProofTree<?>);
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("y")),
@@ -161,9 +161,9 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.unaryInd("f", factory.var("x")))),
 				factory.clauseOf(factory.conLiteral("B", true,  factory.unaryInd("f", factory.var("x"))))
 		));
-			
-		assertTrue(proof instanceof FailProofTree<?>);
-		
+
+		assertTrue(proof instanceof StartProofTree<?>);
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -172,10 +172,10 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.var("y"))),
 				factory.clauseOf(factory.conLiteral("B", true,  factory.var("z")))
 		));
-			
+
 		assertTrue(proof instanceof StartProofTree<?>);
 		System.out.println(proof);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -184,10 +184,10 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.ind("a"))),
 				factory.clauseOf(factory.conLiteral("B", true,  factory.var("z")))
 		));
-			
+
 		assertTrue(proof instanceof StartProofTree<?>);
 		System.out.println(proof);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -196,9 +196,9 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("A", false, factory.var("z"))),
 				factory.clauseOf(factory.conLiteral("B", true,  factory.ind("a")))
 		));
-			
+
 		assertTrue(proof instanceof FailProofTree<?>);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -209,10 +209,10 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("C", false,  factory.var("z"))),
 				factory.clauseOf(factory.conLiteral("B", true,  factory.var("y")))
 		));
-			
+
 		assertTrue(proof instanceof StartProofTree<?>);
 		System.out.println(proof);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -223,9 +223,9 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("B", false,  factory.var("x")),
 								factory.conLiteral("A", true,  factory.var("x")))
 		));
-			
+
 		assertTrue(proof instanceof FailProofTree<?>);
-		
+
 		proof = prover.prove(factory.matrixOf(
 				factory.clauseOf(
 						factory.conLiteral("A", true, factory.var("x")),
@@ -236,7 +236,7 @@ public class ALCHbProverTest {
 				factory.clauseOf(factory.conLiteral("B", false,  factory.var("y")),
 								factory.conLiteral("A", true,  factory.var("y")))
 		));
-			
+
 		assertTrue(proof instanceof FailProofTree<?>);
 	}
 	

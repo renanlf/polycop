@@ -1,19 +1,10 @@
 package edu.br.ufpe.cin.sword.cm.alchb.strategies;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbBiOrderedLiteral;
-import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbConceptLiteral;
-import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbLiteral;
-import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbOrderedLiteral;
-import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbRoleLiteral;
-import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbTerm;
-import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbVariable;
+import edu.br.ufpe.cin.sword.cm.alchb.factories.ALCHbFactory;
+import edu.br.ufpe.cin.sword.cm.alchb.model.*;
 import edu.br.ufpe.cin.sword.cm.strategies.BlockingStrategy;
 
 public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map<ALCHbVariable, ALCHbTerm>, Map<ALCHbTerm, List<ALCHbTerm>>> {
@@ -63,12 +54,22 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		// to think: the termConceptSet should include literal name.
 		termConceptSet = new HashSet<>(termConceptSet);
 		termConceptSet.add(literal.getName());
-		
-		ALCHbTerm previousTerm = termCopies.get(index - 1);			
-		if (conceptsSet(previousTerm, path, subs).containsAll(termConceptSet)) {
-			System.out.println("2-"+ termConceptSet + " | " + term);
-			return true;
+
+		var substitution = getSubstitution(term, subs);
+		var previousSubstitutions = termCopies.subList(0, termCopies.size() - 1).stream().map(termCopy -> getSubstitution(termCopy, subs)).toList();
+		if ((substitution instanceof ALCHbIndividual) && !previousSubstitutions.contains(substitution)) {
+			return false;
 		}
+
+		while (index > 0) {
+			ALCHbTerm previousTerm = termCopies.get(index - 1);
+			if (conceptsSet(previousTerm, path, subs).containsAll(termConceptSet)) {
+				System.out.printf("[blocked] %s(%s) was blocked by %s(%s)%n", term, getSubstitution(term, subs), previousTerm, getSubstitution(previousTerm, subs));
+				return true;
+			}
+			index--;
+		}
+
 		
 		return false;
 	}
@@ -110,7 +111,21 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 			System.out.println(rolesSet + " | " + first + ", " + second);
 			return true;
 		}
-		
+
+		var firstTermSubstituted = getSubstitution(first, subs);
+		var conceptsSetFirstTermSubstituted = conceptsSet(firstTermSubstituted, path, subs);
+		boolean termBlockedByPredecessor = path.stream()
+				.filter(lit -> lit instanceof ALCHbRoleLiteral)
+				.map(lit -> (ALCHbRoleLiteral) lit)
+				.filter(roleLit -> roleLit.getName().equals(literal.getName()) && getSubstitution(roleLit.getSecond(), subs).equals(firstTermSubstituted))
+				.map(ALCHbRoleLiteral::getFirst)
+				.map(term -> getSubstitution(term, subs))
+				.anyMatch(term -> conceptsSet(term, path, subs).containsAll(conceptsSetFirstTermSubstituted));
+
+		if (termBlockedByPredecessor) {
+			return true;
+		}
+
 		return false;
 	}
 	
@@ -130,7 +145,7 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 			ALCHbTerm cursor = cursors.get(0);
 			
 			Set<ALCHbTerm> moreTypicalTerms = edges.stream()
-					.filter(e -> getSubstitution(e.getKey(), subs) == cursor)
+					.filter(e -> Objects.equals(getSubstitution(e.getKey(), subs), cursor))
 					.map(e -> getSubstitution(e.getValue(), subs))
 					.collect(Collectors.toSet());
 			
@@ -165,8 +180,8 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 			Map.Entry<ALCHbTerm, ALCHbTerm> cursor = cursors.get(0);
 			
 			Set<Map.Entry<ALCHbTerm, ALCHbTerm>> moreTypicalPairs = edges.stream()
-					.filter(e -> getSubstitution(e.getKey().getKey(), subs) == cursor.getKey()
-							&& getSubstitution(e.getKey().getValue(), subs) == cursor.getValue())
+					.filter(e -> Objects.equals(getSubstitution(e.getKey().getKey(), subs), cursor.getKey())
+							&& Objects.equals(getSubstitution(e.getKey().getValue(), subs), cursor.getValue()))
 					.map(e -> Map.entry(getSubstitution(e.getValue().getKey(), subs), 
 							getSubstitution(e.getValue().getValue(), subs)))
 					.collect(Collectors.toSet());
@@ -187,7 +202,7 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 	private Set<String> conceptsSet(ALCHbTerm term, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
 		final ALCHbTerm subsTerm = getSubstitution(term, subs);
 		return path.stream().filter(l -> l instanceof ALCHbConceptLiteral).map(l -> (ALCHbConceptLiteral) l)
-				.filter(l -> getSubstitution(l.getTerm(), subs) == subsTerm).map(ALCHbConceptLiteral::getName)
+				.filter(l -> Objects.equals(getSubstitution(l.getTerm(), subs), subsTerm)).map(ALCHbConceptLiteral::getName)
 				.collect(Collectors.toSet());
 	}
 	
@@ -196,13 +211,18 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		final ALCHbTerm subsSecond = getSubstitution(second, subs);
 		
 		return path.stream().filter(l -> l instanceof ALCHbRoleLiteral).map(l -> (ALCHbRoleLiteral) l)
-				.filter(l -> getSubstitution(l.getFirst(), subs) == subsFirst
-						&& getSubstitution(l.getSecond(), subs) == subsSecond)
+				.filter(l -> Objects.equals(getSubstitution(l.getFirst(), subs), subsFirst)
+						&& Objects.equals(getSubstitution(l.getSecond(), subs), subsSecond))
 				.map(ALCHbRoleLiteral::getName)
 				.collect(Collectors.toSet());
 	}
 	
 	private ALCHbTerm getSubstitution(ALCHbTerm term, Map<ALCHbVariable, ALCHbTerm> subs) {
+		if (term instanceof ALCHbUnaryIndividual unaryIndividual) {
+			var fillerTerm = getSubstitution(unaryIndividual.getFillerTerm(), subs);
+			return new ALCHbFactory().unaryInd(unaryIndividual.getName(), fillerTerm);
+		}
+
 		while (subs.containsKey(term)) {
 			term = subs.get(term);
 		}
