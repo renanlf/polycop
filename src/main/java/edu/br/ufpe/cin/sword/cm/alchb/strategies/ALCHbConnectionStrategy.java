@@ -150,23 +150,23 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 		if (Objects.equals(term, other)) return Map.entry(NULL_VAR, NULL_VAR);
 		
 		if (term instanceof ALCHbVariable) {
-			if (other instanceof ALCHbUnaryIndividual unaryIndividual && unaryIndividual.getFillerTerm().equals(term)) {
+			if (other instanceof ALCHbUnaryIndividual unaryIndividual && chainOfUnaryIndHasTerm(unaryIndividual, term)) {
 				return null;
 			}
 			return Map.entry((ALCHbVariable) term, other);
 		}
 
 		if (other instanceof ALCHbVariable) {
-			if (term instanceof ALCHbUnaryIndividual unaryIndividual && unaryIndividual.getFillerTerm().equals(other)) {
+			if (term instanceof ALCHbUnaryIndividual unaryIndividual && chainOfUnaryIndHasTerm(unaryIndividual, term)) {
 				return null;
 			}
 			return Map.entry((ALCHbVariable) other, term);
 		}
-		
-		if (term.getName().equals(other.getName()) 
-				&& term instanceof ALCHbUnaryIndividual 
+
+		if (term.getName().equals(other.getName())
+				&& term instanceof ALCHbUnaryIndividual
 				&& other instanceof ALCHbUnaryIndividual) {
-			
+
 			return unify(((ALCHbUnaryIndividual) term).getFillerTerm(),
 					((ALCHbUnaryIndividual) other).getFillerTerm());
 		}
@@ -174,19 +174,27 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 		return null;
 	}
 
+	private boolean chainOfUnaryIndHasTerm(ALCHbUnaryIndividual unaryIndividual, ALCHbTerm term) {
+		if (unaryIndividual.getFillerTerm() instanceof ALCHbUnaryIndividual innerUnaryIndividual) {
+			return chainOfUnaryIndHasTerm(innerUnaryIndividual, term);
+		}
+
+		return unaryIndividual.getFillerTerm().equals(term);
+	}
+
 	/**
 	 * this method changes the subs map. It is the only point where it is updated.
 	 * this approach ensures immutable map state when backtracking occurs.
 	 * @param entries a set of entries to be added.
 	 */
-	private void putEntries(Set<Map.Entry<ALCHbVariable, ALCHbTerm>> entries) {	
+	private void putEntries(Set<Map.Entry<ALCHbVariable, ALCHbTerm>> entries) {
 		if(!entries.isEmpty()) {
 			subs = new HashMap<>(subs);
 			entries.forEach(e -> subs.put(e.getKey(), e.getValue()));
 			subs = Collections.unmodifiableMap(subs);
 		}
 	}
-	
+
 	private ALCHbTerm getSubstitution(ALCHbTerm term) {
 		if (term instanceof ALCHbUnaryIndividual unaryIndividual) {
 			var fillerTerm = getSubstitution(unaryIndividual.getFillerTerm());
