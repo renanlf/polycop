@@ -98,24 +98,7 @@ public class ALCHbCopyStrategy implements CopyStrategy<ALCHbLiteral, Map<ALCHbTe
 	}
 	
 	private ALCHbUnaryIndividual copyUnaryInd(ALCHbUnaryIndividual term, Map<ALCHbTerm, ALCHbTerm> termsMap) {
-		term = term.getCopyOf() == null ? term : (ALCHbUnaryIndividual) term.getCopyOf();
-		
-		if (!copies.containsKey(term))
-			copies.put(term, Collections.emptyList());
-
-		// "opens" the list to add new copies
-		List<ALCHbTerm> copiesList = new ArrayList<>(copies.get(term));
-		
-		int numberOfCopies = copiesList.size();
-		String newTermName = term.getName() + COPY_SYMBOL.repeat(numberOfCopies + 1);
-		
-		ALCHbUnaryIndividual newUnaryInd = factory.unaryInd(newTermName, termsMap.get(term.getFillerTerm()), term);
-		copiesList.add(newUnaryInd);
-
-		// "closes" the list and adds it to the map
-		copies.put(term, Collections.unmodifiableList(copiesList));
-		
-		return newUnaryInd;
+		return factory.unaryInd(term.getName(), termsMap.get(term.getFillerTerm()));
 	}
 
 	private ALCHbLiteral copyLiteral(ALCHbLiteral literal, Map<ALCHbTerm, ALCHbTerm> termsMap) {

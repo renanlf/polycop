@@ -2,6 +2,7 @@ package edu.br.ufpe.cin.sword.cm.alch;
 
 import edu.br.ufpe.cin.sword.cm.alchb.ALCHbSimpleProver;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbLiteral;
+import edu.br.ufpe.cin.sword.cm.mapper.exceptions.FileParserException;
 import edu.br.ufpe.cin.sword.cm.tree.AxiomProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.StartProofTree;
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
@@ -217,6 +219,93 @@ public class ALCHProverTest {
     public void testProveOntology17() {
         // GIVEN
         var file = new File("src/test/resources/alch/17_test_cyclic_consistency003.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology18() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/18_test_cyclic_inconsistency003.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof StartProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology19() {
+        // GIVEN
+        var file = new File("src/test/resources/alch/19_test_cyclic_consistency004.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    // TODO: check infinite loop?
+    @Test
+    public void testProveOntology20() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/20_test_cyclic_consistency007.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology21() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/21_test_cyclic_consistency008.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    @Test
+    public void testProveOntology22() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/22_test_cyclic_pure.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    // TODO: check if it ends (it is slow)
+    @Test
+    public void testProveOntology23() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/23_test_cyclic_consistency005_slow.owl");
+
+        // WHEN
+        var result = this.prover.prove(file);
+
+        // THEN
+        assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
+    }
+
+    // TODO: check if it ends (it is slow)
+//    @Test
+    public void testProveOntology24() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/24_test_cyclic_consistency006_slow.owl");
 
         // WHEN
         var result = this.prover.prove(file);

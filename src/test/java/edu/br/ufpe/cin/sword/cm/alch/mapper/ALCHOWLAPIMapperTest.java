@@ -220,4 +220,89 @@ public class ALCHOWLAPIMapperTest {
         // THEN
         System.out.println(matrix);
     }
+
+    @Test
+    public void testMapOntology18() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/18_test_cyclic_inconsistency003.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology19() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/19_test_cyclic_consistency004.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology20() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/20_test_cyclic_consistency007.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology21() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/21_test_cyclic_consistency008.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology22() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/22_test_cyclic_pure.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    @Test
+    public void testMapOntology23() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/23_test_cyclic_consistency005_slow.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
+
+    // TODO: check case when quantifier is on one side and a non literal is on the other side
+    @Test
+    public void testMapOntology24() throws FileParserException, IOException {
+        // GIVEN
+        var file = new File("src/test/resources/alch/24_test_cyclic_consistency006_slow.owl");
+
+        // WHEN
+        var matrix = this.mapper.map(file);
+
+        // THEN
+        System.out.println(matrix);
+    }
 }
