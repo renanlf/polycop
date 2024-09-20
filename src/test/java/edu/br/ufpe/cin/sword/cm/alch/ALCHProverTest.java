@@ -249,8 +249,7 @@ public class ALCHProverTest {
         assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
     }
 
-    // TODO: check infinite loop?
-//    @Test
+    @Test
     public void testProveOntology20() {
         // GIVEN
         var file = new File("src/test/resources/alch/20_test_cyclic_consistency007.owl");
@@ -286,8 +285,7 @@ public class ALCHProverTest {
         assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
     }
 
-    // TODO: check if it ends (it is slow)
-//    @Test
+    @Test
     public void testProveOntology23() {
         // GIVEN
         var file = new File("src/test/resources/alch/23_test_cyclic_consistency005_slow.owl");
