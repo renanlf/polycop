@@ -1,11 +1,6 @@
 package edu.br.ufpe.cin.sword.cm.alchb.strategies;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import edu.br.ufpe.cin.sword.cm.alchb.factories.ALCHbFactory;
 import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbBiOrderedLiteral;
@@ -62,24 +57,32 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 		return true;
 	}
 
-	private boolean connect(ALCHbRoleLiteral literal, ALCHbRoleLiteral other) {		
+	private boolean connect(ALCHbRoleLiteral literal, ALCHbRoleLiteral other) {
 		Map.Entry<ALCHbVariable, ALCHbTerm> entryFirst = unify(getSubstitution(literal.getFirst()),
 				getSubstitution(other.getFirst()));
+
+		if (entryFirst == null) {
+			return false;
+		} else if (entryFirst.getKey() != NULL_VAR) {
+			putEntries(Set.of(entryFirst));
+		}
 
 		Map.Entry<ALCHbVariable, ALCHbTerm> entrySecond = unify(getSubstitution(literal.getSecond()),
 				getSubstitution(other.getSecond()));
 
-		if (entryFirst == null || entrySecond == null)
+		if (entrySecond == null) {
+			removeEntries(Set.of(entryFirst));
 			return false;
+		}
 
 		Set<Map.Entry<ALCHbVariable, ALCHbTerm>> entries = new HashSet<>();
-		
+
 		if(entryFirst.getKey() != NULL_VAR)
 			entries.add(entryFirst);
-		
+
 		if(entrySecond.getKey() != NULL_VAR)
 			entries.add(entrySecond);
-		
+
 		putEntries(entries);
 
 		return true;
@@ -89,11 +92,19 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 		Map.Entry<ALCHbVariable, ALCHbTerm> entryFirst = unify(getSubstitution(literal.getFirst()),
 				getSubstitution(other.getFirst()));
 
+		if (entryFirst == null) {
+			return false;
+		} else {
+			putEntries(Collections.singleton(entryFirst));
+		}
+
 		Map.Entry<ALCHbVariable, ALCHbTerm> entrySecond = unify(getSubstitution(literal.getSecond()),
 				getSubstitution(other.getSecond()));
 
-		if (entryFirst == null || entrySecond == null)
+		if (entrySecond == null) {
+			removeEntries(Set.of(entryFirst));
 			return false;
+		}
 
 		Set<Map.Entry<ALCHbVariable, ALCHbTerm>> entries = new HashSet<>();
 		
@@ -112,33 +123,41 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 		Map.Entry<ALCHbVariable, ALCHbTerm> entryFirst = unify(getSubstitution(literal.getFirst()),
 				getSubstitution(other.getFirst()));
 
+		if (entryFirst == null) {
+			return false;
+		} else {
+			putEntries(Collections.singleton(entryFirst));
+		}
+
 		Map.Entry<ALCHbVariable, ALCHbTerm> entrySecond = unify(getSubstitution(literal.getSecond()),
 				getSubstitution(other.getSecond()));
+
+		if (entrySecond == null) {
+			removeEntries(Set.of(entryFirst));
+			return false;
+		} else {
+			putEntries(Collections.singleton(entrySecond));
+		}
 
 		Map.Entry<ALCHbVariable, ALCHbTerm> entryThird = unify(getSubstitution(literal.getThird()),
 				getSubstitution(other.getThird()));
 
+		if (entryThird == null) {
+			removeEntries(Set.of(entryFirst, entrySecond));
+			return false;
+		} else {
+			putEntries(Collections.singleton(entryThird));
+		}
+
 		Map.Entry<ALCHbVariable, ALCHbTerm> entryFourth = unify(getSubstitution(literal.getFourth()),
 				getSubstitution(other.getFourth()));
 
-		if (entryFirst == null || entrySecond == null || entryThird == null || entryFourth == null)
+		if (entryFourth == null) {
+			removeEntries(Set.of(entryFirst, entrySecond, entryThird));
 			return false;
-
-		Set<Map.Entry<ALCHbVariable, ALCHbTerm>> entries = new HashSet<>();
-		
-		if(entryFirst.getKey() != NULL_VAR)
-			entries.add(entryFirst);
-		
-		if(entrySecond.getKey() != NULL_VAR)
-			entries.add(entrySecond);
-		
-		if(entryThird.getKey() != NULL_VAR)		
-			entries.add(entryThird);
-		
-		if(entryFourth.getKey() != NULL_VAR)
-			entries.add(entryFourth);
-		
-		putEntries(entries);
+		} else {
+			putEntries(Collections.singleton(entryFourth));
+		}
 
 		return true;
 	}
@@ -157,7 +176,7 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 		}
 
 		if (other instanceof ALCHbVariable) {
-			if (term instanceof ALCHbUnaryIndividual unaryIndividual && chainOfUnaryIndHasTerm(unaryIndividual, term)) {
+			if (term instanceof ALCHbUnaryIndividual unaryIndividual && chainOfUnaryIndHasTerm(unaryIndividual, other)) {
 				return null;
 			}
 			return Map.entry((ALCHbVariable) other, term);
@@ -179,7 +198,7 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 			return chainOfUnaryIndHasTerm(innerUnaryIndividual, term);
 		}
 
-		return unaryIndividual.getFillerTerm().equals(term);
+		return Objects.equals(unaryIndividual.getFillerTerm(), term);
 	}
 
 	/**
@@ -189,8 +208,16 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 	 */
 	private void putEntries(Set<Map.Entry<ALCHbVariable, ALCHbTerm>> entries) {
 		if(!entries.isEmpty()) {
-			subs = new HashMap<>(subs);
+			subs = new LinkedHashMap<>(subs);
 			entries.forEach(e -> subs.put(e.getKey(), e.getValue()));
+			subs = Collections.unmodifiableMap(subs);
+		}
+	}
+
+	private void removeEntries(Set<Map.Entry<ALCHbVariable, ALCHbTerm>> entries) {
+		if(!entries.isEmpty()) {
+			subs = new LinkedHashMap<>(subs);
+			entries.forEach(e -> subs.remove(e.getKey(), e.getValue()));
 			subs = Collections.unmodifiableMap(subs);
 		}
 	}
@@ -201,8 +228,8 @@ public class ALCHbConnectionStrategy implements ConnectionStrategy<ALCHbLiteral,
 			return new ALCHbFactory().unaryInd(unaryIndividual.getName(), fillerTerm);
 		}
 
-		while (subs.containsKey(term)) {
-			term = subs.get(term);
+		if (subs.containsKey(term)) {
+			return getSubstitution(subs.get(term));
 		}
 
 		return term;

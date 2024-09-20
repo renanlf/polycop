@@ -30,7 +30,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 		this.copyStrategy = copyStrategy;
 		this.litHelperStrategy = litHelperStrategy;
 		this.blockingStrategy = blockingStrategy;
-		this.proofFactory = new ProofTreeFactory<Literal>();
+		this.proofFactory = new ProofTreeFactory<>();
 	}
 
 	public ProofTree<Literal> prove(List<List<Literal>> matrix) {
@@ -47,6 +47,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 			if (copyClause.isPresent() && !copyClause.get().isEmpty()) {
 
+				System.out.printf("[St] - %s  %n", copyClause.get());
 				ProofTree<Literal> proof = proveClause(copyClause.get(), matrix, Set.of());
 
 				if (!(proof instanceof FailProofTree)) {
@@ -62,6 +63,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 
 	private ProofTree<Literal> proveClause(List<Literal> clause, List<List<Literal>> matrix,
 			Set<Literal> path) {
+
 		if (clause.isEmpty()) 
 			return proofFactory.ax(path);
 
@@ -75,6 +77,7 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 		for (Literal negLiteral : litHelperStrategy.complementaryOf(literal, path)) {
 			if (connStrategy.connect(literal, negLiteral)) {
 
+				System.out.printf("[Red] - <%s, %s, %s>  %n", literal, path, connStrategy.getState());
 				ProofTree<Literal> subProof = proveClause(minus(clause, literal), matrix, path);
 
 				if (!(subProof instanceof FailProofTree)) {	
@@ -97,22 +100,25 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 						if (!blockingStrategy.isBlocked(negLiteral, path, connStrategy.getState(),
 								copyStrategy.getState())) {							
 
-							ProofTree<Literal> subProofRight = proveClause(minus(clause, literal), matrix, path);
-
-							if (!(subProofRight instanceof FailProofTree)) {
-								ProofTree<Literal> subProofLeft = proveClause(minus(copyClause.get(), negLiteral), matrix,
+							System.out.printf("[Ext-Left] - <%s, %s, %s, %s>  %n", literal, copyClause.get(), path, connStrategy.getState());
+							ProofTree<Literal> subProofLeft = proveClause(minus(copyClause.get(), negLiteral), matrix,
 									add(path, literal));
 
-								if (!(subProofLeft instanceof FailProofTree)) {
+							if (!(subProofLeft instanceof FailProofTree)) {
+								System.out.printf("[Ext-Right] - <%s, %s, %s, %s>  %n", literal, clause, path, connStrategy.getState());
+								ProofTree<Literal> subProofRight = proveClause(minus(clause, literal), matrix, path);
+								if (!(subProofRight instanceof FailProofTree)) {
 									return proofFactory.ext(clause, path, subProofLeft, subProofRight);
 								}
 							}
 						}
 						// if comes here, then some subProof is failed.
+						System.out.printf("[Backtrack connection] - <%s, %s, %s, %s, %s>  %n", literal, negLiteral, copyClause.get(), path, connStrategy.getState());
 						connStrategy.setState(connState);
 					}
 				}
 				// if comes here, then this copy is failed
+				System.out.printf("[Backtrack copy] - <%s, %s, %s, %s>  %n", literal, copyClause.get(), path, connStrategy.getState());
 				copyStrategy.setState(copyState);
 			}
 		}
@@ -121,15 +127,13 @@ public class SimpleProver<Literal, ConnectionState, CopyState> implements Prover
 	}
 
 	private Set<Literal> add(Set<Literal> previousSet, Literal toAdd) {
-		Set<Literal> newSet = new HashSet<>();
-		newSet.addAll(previousSet);
+		Set<Literal> newSet = new HashSet<>(previousSet);
 		newSet.add(toAdd);
 		return newSet;
 	}
 
 	private List<Literal> minus(List<Literal> previousList, Literal toRemove) {
-		List<Literal> newList = new ArrayList<>();
-		newList.addAll(previousList);
+		List<Literal> newList = new ArrayList<>(previousList);
 		newList.remove(toRemove);
 		return newList;
 	}

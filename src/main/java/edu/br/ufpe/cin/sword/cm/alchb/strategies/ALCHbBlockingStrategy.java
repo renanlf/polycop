@@ -40,7 +40,7 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 			System.out.println(termConceptSet + " | " + term);
 			return true;
 		}
-		
+
 		if(term.getCopyOf() == null) return false;
 		
 		ALCHbTerm originalTerm = term.getCopyOf();
@@ -122,12 +122,8 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 				.map(term -> getSubstitution(term, subs))
 				.anyMatch(term -> conceptsSet(term, path, subs).containsAll(conceptsSetFirstTermSubstituted));
 
-		if (termBlockedByPredecessor) {
-			return true;
-		}
-
-		return false;
-	}
+        return termBlockedByPredecessor;
+    }
 	
 	private boolean isBlocked(ALCHbOrderedLiteral literal, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
 		Set<Map.Entry<ALCHbTerm, ALCHbTerm>> edges = path.stream()
@@ -201,8 +197,11 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 
 	private Set<String> conceptsSet(ALCHbTerm term, Set<ALCHbLiteral> path, Map<ALCHbVariable, ALCHbTerm> subs) {
 		final ALCHbTerm subsTerm = getSubstitution(term, subs);
-		return path.stream().filter(l -> l instanceof ALCHbConceptLiteral).map(l -> (ALCHbConceptLiteral) l)
-				.filter(l -> Objects.equals(getSubstitution(l.getTerm(), subs), subsTerm)).map(ALCHbConceptLiteral::getName)
+		return path.stream()
+				.filter(l -> l instanceof ALCHbConceptLiteral)
+				.map(l -> (ALCHbConceptLiteral) l)
+				.filter(l -> Objects.equals(getSubstitution(l.getTerm(), subs), subsTerm))
+				.map(ALCHbConceptLiteral::getName)
 				.collect(Collectors.toSet());
 	}
 	
@@ -216,15 +215,15 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 				.map(ALCHbRoleLiteral::getName)
 				.collect(Collectors.toSet());
 	}
-	
+
 	private ALCHbTerm getSubstitution(ALCHbTerm term, Map<ALCHbVariable, ALCHbTerm> subs) {
 		if (term instanceof ALCHbUnaryIndividual unaryIndividual) {
 			var fillerTerm = getSubstitution(unaryIndividual.getFillerTerm(), subs);
 			return new ALCHbFactory().unaryInd(unaryIndividual.getName(), fillerTerm);
 		}
 
-		while (subs.containsKey(term)) {
-			term = subs.get(term);
+		if (subs.containsKey(term)) {
+			return getSubstitution(subs.get(term), subs);
 		}
 
 		return term;
