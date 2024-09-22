@@ -9,6 +9,10 @@ One solution for developing provers is the Connection Method (CM). This goal-ori
 Another advantage of CM is its uniformity, which allows it to be applied to a range of logical languages with the same proof technique.
 Besides that, CM's uniformity provides a simple sharing of high-level optimization implementations between CMs.
 
+## Logical languages available:
+- Propositional
+- Description logic $\mathcal{ALCH}$
+
 ## Installation
 
 ### Pre-requisites
@@ -35,6 +39,14 @@ Now, you can run the PolyCoP as the following example:
 java -jar target/polycop-$VERSION-jar-with-dependencies.jar -prover propositional -file $FILEPATH
 ```
 Where `$FILEPATH` is a path to a CNF-valid file.
+
+## Running PolyCoP for the description logic $\mathcal{ALCH}$ case
+
+Besides the propositional case, you can run the description logic $\mathcal{ALCH}$ as well. The input in this case is an OWL file. You can run the PolyCoP as the following example:
+```bash
+java -jar target/polycop-$VERSION-jar-with-dependencies.jar -prover alch -file $FILEPATH
+```
+Where `$FILEPATH` is a path to an OWL-valid file.
 
 ## Generating proof in sequent-style to a .tex file
 
