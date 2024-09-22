@@ -124,6 +124,18 @@ public class ALCHbNormalizeOWLAxiomVisitor implements OWLAxiomVisitor {
                     List.of(owlDataFactory.getOWLSubClassOfAxiom(owlDataFactory.getOWLObjectAllValuesFrom(allValuesFrom.getProperty(), newClass), rightSideClassExpression)),
                     List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, allValuesFrom.getFiller()))
             );
+        } else if (!leftSideClassExpression.isClassExpressionLiteral() && rightSideClassExpression instanceof OWLQuantifiedObjectRestriction quantifiedObjectRestriction && quantifiedObjectRestriction.getFiller().isClassExpressionLiteral()) {
+            var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
+            this.visitResult = new ALCHbOWLAxiomVisit(
+                    List.of(owlDataFactory.getOWLSubClassOfAxiom(newClass, rightSideClassExpression)),
+                    List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, leftSideClassExpression))
+            );
+        } else if (!rightSideClassExpression.isClassExpressionLiteral() && leftSideClassExpression instanceof OWLQuantifiedObjectRestriction quantifiedObjectRestriction && quantifiedObjectRestriction.getFiller().isClassExpressionLiteral()) {
+            var newClass = owlDataFactory.getOWLClass(UUID.randomUUID().toString());
+            this.visitResult = new ALCHbOWLAxiomVisit(
+                    List.of(owlDataFactory.getOWLSubClassOfAxiom(leftSideClassExpression, newClass)),
+                    List.of(owlDataFactory.getOWLEquivalentClassesAxiom(newClass, rightSideClassExpression))
+            );
         } else {
             this.visitResult = new ALCHbOWLAxiomVisit(List.of(axiom), List.of());
         }

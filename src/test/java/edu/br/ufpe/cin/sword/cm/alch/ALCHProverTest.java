@@ -297,8 +297,7 @@ public class ALCHProverTest {
         assertTrue(result instanceof FailProofTree<ALCHbLiteral>);
     }
 
-    // TODO: check if it ends (it is slow)
-//    @Test
+    @Test
     public void testProveOntology24() {
         // GIVEN
         var file = new File("src/test/resources/alch/24_test_cyclic_consistency006_slow.owl");
