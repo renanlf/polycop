@@ -37,7 +37,6 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 
 		
 		if (termConceptSet.contains(literal.getName())) {
-			System.out.println(termConceptSet + " | " + term);
 			return true;
 		}
 
@@ -64,7 +63,6 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		while (index > 0) {
 			ALCHbTerm previousTerm = termCopies.get(index - 1);
 			if (conceptsSet(previousTerm, path, subs).containsAll(termConceptSet)) {
-				System.out.printf("[blocked] %s(%s) was blocked by %s(%s)%n", term, getSubstitution(term, subs), previousTerm, getSubstitution(previousTerm, subs));
 				return true;
 			}
 			index--;
@@ -83,7 +81,6 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		
 
 		if (rolesSet.contains(literal.getName())) {
-			System.out.println(rolesSet + " | " + first + ", " + second);
 			return true;
 		}
 		
@@ -108,7 +105,6 @@ public class ALCHbBlockingStrategy implements BlockingStrategy<ALCHbLiteral, Map
 		rolesSet.add(literal.getName());
 		
 		if (rolesSet(previousFirst, previousSecond, path, subs).containsAll(rolesSet)) {
-			System.out.println(rolesSet + " | " + first + ", " + second);
 			return true;
 		}
 
