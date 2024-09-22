@@ -293,7 +293,6 @@ public class ALCHOWLAPIMapperTest {
         System.out.println(matrix);
     }
 
-    // TODO: check case when quantifier is on one side and a non literal is on the other side
     @Test
     public void testMapOntology24() throws FileParserException, IOException {
         // GIVEN
