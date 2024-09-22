@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.br.ufpe.cin.sword.cm.alchb.ALCHbSimpleProver;
 import edu.br.ufpe.cin.sword.cm.mapper.exceptions.FileParserException;
 import edu.br.ufpe.cin.sword.cm.propositional.PropositionalConnectionProverDecorator;
 import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
@@ -56,6 +57,9 @@ public class MainExecutable {
             case "propositional":
                 runPropositionalProver(file, latexFilepath);
                 break;
+            case "alch":
+                runALCHProver(file, latexFilepath);
+                break;
             default:
                 throw new IllegalArgumentException("prover invalid");
         }
@@ -65,10 +69,25 @@ public class MainExecutable {
         PropositionalConnectionProverDecorator prover = new PropositionalConnectionProverDecorator();
         var proofTree = prover.prove(new File(file));
 
-        if (proofTree instanceof FailProofTree<Integer>) {
+        if (proofTree instanceof FailProofTree<?>) {
             System.out.println(file + " is satisfiable");
         } else {
             System.out.println(file + " is unsatisfiable");
+        }
+
+        if (latexFilepath != null) {
+            generateLaTeXFile(proofTree, latexFilepath);
+        }
+    }
+
+    private static void runALCHProver(String file, String latexFilepath) throws IOException {
+        var prover = new ALCHbSimpleProver();
+        var proofTree = prover.prove(new File(file));
+
+        if (proofTree instanceof FailProofTree<?>) {
+            System.out.println(file + " is consistent");
+        } else {
+            System.out.println(file + " is inconsistent");
         }
 
         if (latexFilepath != null) {
