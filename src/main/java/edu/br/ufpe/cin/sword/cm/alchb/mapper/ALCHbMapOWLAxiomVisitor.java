@@ -14,6 +14,7 @@ import java.util.UUID;
 public class ALCHbMapOWLAxiomVisitor {
 
     private final ALCHbFactory alchbFactory;
+    private int varIndex = 1;
 
     public ALCHbMapOWLAxiomVisitor(ALCHbFactory alchbFactory) {
         this.alchbFactory = alchbFactory;
@@ -80,8 +81,8 @@ public class ALCHbMapOWLAxiomVisitor {
 
         var subPropertyName = axiom.getSubProperty().getNamedProperty().getIRI().getShortForm();
         var superPropertyName = axiom.getSuperProperty().getNamedProperty().getIRI().getShortForm();
-        var firstTerm = alchbFactory.var(UUID.randomUUID().toString());
-        var secondTerm = alchbFactory.var(UUID.randomUUID().toString());
+        var firstTerm = alchbFactory.var(getNextVariableName());
+        var secondTerm = alchbFactory.var(getNextVariableName());
 
         return List.of(List.of(
                 alchbFactory.roleLiteral(subPropertyName, true, firstTerm, secondTerm),
@@ -93,7 +94,7 @@ public class ALCHbMapOWLAxiomVisitor {
         var leftClassExpression = axiom.getSubClass();
         var nnfRightClassExpression = axiom.getSuperClass().getObjectComplementOf().getNNF();
 
-        var x1 = alchbFactory.var(UUID.randomUUID().toString());
+        var x1 = alchbFactory.var(getNextVariableName());
 
         if (nnfRightClassExpression instanceof OWLObjectAllValuesFrom allValuesFrom) {
             return createMatrixWithAllValuesFrom(allValuesFrom, leftClassExpression, x1);
@@ -115,7 +116,7 @@ public class ALCHbMapOWLAxiomVisitor {
                 } else if (classExpression instanceof OWLObjectComplementOf complementOf) {
                     clause.add(alchbFactory.conLiteral(complementOf.getOperand().asOWLClass().getIRI().getShortForm(), false, x1));
                 } else if (classExpression instanceof OWLObjectSomeValuesFrom someValuesFrom) {
-                    var y1 = alchbFactory.var(UUID.randomUUID().toString());
+                    var y1 = alchbFactory.var(getNextVariableName());
                     var propName = someValuesFrom.getProperty().getNamedProperty().getIRI().getShortForm();
                     var fillerIsPositive = someValuesFrom.getFiller().isOWLClass();
                     var fillerClassName = fillerIsPositive
@@ -143,8 +144,8 @@ public class ALCHbMapOWLAxiomVisitor {
     }
 
     private List<List<ALCHbLiteral>> createMatrixWithAllValuesFrom(OWLObjectAllValuesFrom allValuesFrom, OWLClassExpression otherLiteralExpression, ALCHbTerm x1) {
-        var x2 = alchbFactory.var(UUID.randomUUID().toString());
-        var aName = UUID.randomUUID().toString();
+        var x2 = alchbFactory.var(getNextVariableName());
+        var aName = getNextVariableName();
         var aX1 = alchbFactory.unaryInd(aName, x1);
         var aX2 = alchbFactory.unaryInd(aName, x2);
         var positive = otherLiteralExpression.isOWLClass();
@@ -191,5 +192,10 @@ public class ALCHbMapOWLAxiomVisitor {
                 List.of(alchbFactory.conLiteral(className, positive, x1), alchbFactory.roleLiteral(propName, false, x1, aX1)),
                 List.of(alchbFactory.conLiteral(className, positive, x2), alchbFactory.conLiteral(fillerClassName, fillerIsPositive, aX2))
         );
+    }
+
+    private String getNextVariableName() {
+//        return UUID.randomUUID().toString();
+        return String.format("x_{%d}", varIndex++);
     }
 }
