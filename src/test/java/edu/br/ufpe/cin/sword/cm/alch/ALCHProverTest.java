@@ -5,6 +5,7 @@ import edu.br.ufpe.cin.sword.cm.alchb.model.ALCHbLiteral;
 import edu.br.ufpe.cin.sword.cm.tree.AxiomProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.FailProofTree;
 import edu.br.ufpe.cin.sword.cm.tree.StartProofTree;
+import edu.br.ufpe.cin.sword.cm.util.LaTeXGenerator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -211,6 +212,7 @@ public class ALCHProverTest {
 
         // THEN
         assertTrue(result instanceof StartProofTree<ALCHbLiteral>);
+        System.out.println(LaTeXGenerator.generateProofDocument(result));
     }
 
     @Test
